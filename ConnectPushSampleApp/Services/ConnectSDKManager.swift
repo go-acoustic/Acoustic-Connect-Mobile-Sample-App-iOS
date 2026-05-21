@@ -173,15 +173,78 @@ final class ConnectSDKManager: ObservableObject {
 
     // MARK: - Identity
 
-    /// Logs a single identity signal and records the pair in ``identityHistory``.
-    func logIdentity(
-        name: String,
-        value: String,
-        signalType: String = "pageView",
-        additionalParameters: [String: String] = ["url": "http://acoustic.co/test"]
+    /// Logs a `loggedIn` identity signal to associate the current device with a known user.
+    ///
+    /// Call this right after a successful sign-in so Connect can stitch the user's
+    /// session to their profile and any subsequent behavioral signals.
+    ///
+    /// - Parameters:
+    ///   - identifierName: The identifier type (for example, `"email"` or `"customerId"`).
+    ///   - identifierValue: The identifier value for the signed-in user.
+    ///   - additionalParameters: Optional context attached to the signal.
+    ///     Defaults to `["loginMethod": "email"]`.
+    ///
+    /// See: https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-sign-in-ios
+    func logUserLoggedIn(
+        identifierName: String,
+        identifierValue: String,
+        additionalParameters: [String: String] = ["loginMethod": "email"]
     ) {
-        let trimmedName = name.trimmingCharacters(in: .whitespaces)
-        let trimmedValue = value.trimmingCharacters(in: .whitespaces)
+        logIdentity(
+            identifierName: identifierName,
+            identifierValue: identifierValue,
+            signalType: "loggedIn",
+            additionalParameters: additionalParameters
+        )
+    }
+
+    /// Logs an `accountRegistered` identity signal when a new user completes registration.
+    ///
+    /// Call this once at the end of a successful sign-up flow so Connect can create
+    /// the user's profile and begin tracking activity against it.
+    ///
+    /// - Parameters:
+    ///   - identifierName: The identifier type (for example, `"email"` or `"customerId"`).
+    ///   - identifierValue: The identifier value for the newly registered user.
+    ///   - signalType: The signal name to record. Defaults to `"accountRegistered"`;
+    ///     override only when your Connect configuration uses a custom signal.
+    ///   - additionalParameters: Optional context attached to the signal.
+    ///     Defaults to `["registrationMethod": "email"]`.
+    ///
+    /// See: https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-registration-ios
+    func logUserRegistered(
+        identifierName: String,
+        identifierValue: String,
+        signalType: String = "accountRegistered",
+        additionalParameters: [String: String] = ["registrationMethod": "email"]
+    ) {
+        logIdentity(
+            identifierName: identifierName,
+            identifierValue: identifierValue,
+            signalType: signalType,
+            additionalParameters: additionalParameters
+        )
+    }
+
+    /// Trims and forwards an identity signal to the SDK, updates ``identityLogResult``,
+    /// and prepends the pair to ``identityHistory`` (capped at the five most recent).
+    ///
+    /// Empty or whitespace-only inputs are ignored so the demo form can't submit blanks.
+    /// The history is persisted to `UserDefaults` so it survives app restarts.
+    ///
+    /// - Parameters:
+    ///   - identifierName: The identifier type; trimmed before use.
+    ///   - identifierValue: The identifier value; trimmed before use.
+    ///   - signalType: The Connect identity signal name (for example, `"loggedIn"`).
+    ///   - additionalParameters: Context attached to the signal.
+    private func logIdentity(
+        identifierName: String,
+        identifierValue: String,
+        signalType: String,
+        additionalParameters: [String: String]
+    ) {
+        let trimmedName = identifierName.trimmingCharacters(in: .whitespaces)
+        let trimmedValue = identifierValue.trimmingCharacters(in: .whitespaces)
         guard !trimmedName.isEmpty, !trimmedValue.isEmpty else { return }
 
         let success = ConnectSDK.shared.identity.log(

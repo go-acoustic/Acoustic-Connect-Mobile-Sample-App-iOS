@@ -76,8 +76,14 @@ struct IdentityDemoView: View {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
 
-                Button("Log Identity") {
-                    manager.logIdentity(name: identifierName, value: identifierValue)
+                Button("Log Logged In With Email") {
+                    manager.logUserLoggedIn(identifierName: identifierName, identifierValue: identifierValue)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(!canLog)
+                
+                Button("Log Account Registered With Email") {
+                    manager.logUserRegistered(identifierName: identifierName, identifierValue: identifierValue)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
