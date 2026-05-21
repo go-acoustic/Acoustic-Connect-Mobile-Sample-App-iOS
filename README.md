@@ -19,7 +19,7 @@ identity logging.
 | **Notification Service Extension** | Rich push support (images, expanded content) |
 | **Notification Content Extension** | Custom notification UI |
 | **Analytics capture** | Enabled by default — events, screenshots, and screen visits out of the box |
-| **Identity logging** | Log identity signals and view recent history |
+| **Identity logging** | Log `loggedIn` and `accountRegistered` signals and view recent history |
 | **Test payloads** | `.apns` files for simulator push testing |
 
 ---
@@ -133,6 +133,37 @@ For per-screen customisation (e.g., disabling capture on specific screens or
 adding custom masking rules), add a `ConnectLayoutConfig.json` to your app
 bundle. See the [Integration Guide](docs/integration-guide.md#analytics-configuration)
 for details.
+
+---
+
+## Identity logging
+
+`ConnectSDKManager` exposes two helpers for associating a device with a known
+user. Both forward to `ConnectSDK.shared.identity.log` and update the recent
+identity history shown in the demo UI.
+
+| Method | Signal | When to call |
+|--------|--------|--------------|
+| `logUserLoggedIn(identifierName:identifierValue:additionalParameters:)` | `loggedIn` | After a successful sign-in |
+| `logUserRegistered(identifierName:identifierValue:signalType:additionalParameters:)` | `accountRegistered` | After a successful sign-up |
+
+```swift
+ConnectSDKManager.shared.logUserLoggedIn(
+    identifierName: "email",
+    identifierValue: "jane@example.com"
+)
+```
+
+`identifierName` is the identifier type configured in Connect (for example,
+`email` or `customerId`); `identifierValue` is the user's value for that
+identifier. `additionalParameters` attaches optional context to the signal —
+defaults are `["loginMethod": "email"]` and `["registrationMethod": "email"]`.
+
+See the Connect docs for
+[sign-in](https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-sign-in-ios)
+and
+[registration](https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-registration-ios)
+identity flows.
 
 ---
 
