@@ -262,7 +262,7 @@
 			mainGroup = 0C590EA22F460ED200F4DABB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "Connect-SP" */,
+				0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "ConnectDebug-SP" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0C590EAC2F460ED200F4DABB /* Products */;
@@ -698,12 +698,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "Connect-SP" */ = {
+		0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "ConnectDebug-SP" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/go-acoustic/Connect-SP";
+			repositoryURL = "https://github.com/go-acoustic/ConnectDebug-SP";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.8;
+				kind = exactVersion;
+				version = 2.1.31;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -711,17 +711,17 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0CC1B59C2F8FB4B500337993 /* Connect */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "Connect-SP" */;
+			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "ConnectDebug-SP" */;
 			productName = Connect;
 		};
 		0CC1B59E2F8FB4BE00337993 /* Connect */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "Connect-SP" */;
+			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "ConnectDebug-SP" */;
 			productName = Connect;
 		};
 		0CC1B5A02F8FB4CC00337993 /* Connect */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "Connect-SP" */;
+			package = 0CC1B59B2F8FB4B500337993 /* XCRemoteSwiftPackageReference "ConnectDebug-SP" */;
 			productName = Connect;
 		};
 /* End XCSwiftPackageProductDependency section */
