@@ -1,9 +1,23 @@
-# Acoustic Connect Push Sample App
+# Acoustic Connect Sample Apps for iOS
 
-SwiftUI sample app demonstrating **mobile push notification** integration with
-the [Acoustic Connect iOS SDK](https://github.com/go-acoustic/ConnectDebug-SP).
+Two sample apps demonstrating integration with the
+[Acoustic Connect iOS SDK](https://github.com/go-acoustic/ConnectDebug-SP).
 
-Use this alongside the
+| App | UI framework | Covers |
+|-----|--------------|--------|
+| [`ConnectSampleApp`](ConnectSampleApp) | SwiftUI | Push notifications, identity, behaviour capture |
+| [`ConnectSampleAppUIKit`](ConnectSampleAppUIKit) | UIKit | Identity and behaviour capture — no push |
+
+Both drive the same feature code from [`Shared/`](Shared), so the only
+difference between them is the UI layer. The UIKit app is analytics-only on
+purpose: push behaviour does not depend on the UI framework, while behaviour
+capture does — screen-view emission, control capture and masking take different
+routes in UIKit and SwiftUI. It needs no certificates, provisioning profiles or
+notification extensions, so it is the quicker of the two to run.
+
+Start with `ConnectSampleApp` unless you specifically want the UIKit surface.
+
+Use these alongside the
 [Integration Guide](docs/integration-guide.md)
 to see a working implementation of push registration, notification handling, and
 identity logging.
@@ -37,21 +51,25 @@ guide.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/go-acoustic/Acoustic-Connect-Mobile-Push-Sample-App.git
-cd Acoustic-Connect-Mobile-Push-Sample-App
+git clone https://github.com/go-acoustic/Acoustic-Connect-Mobile-Sample-App-iOS.git
+cd Acoustic-Connect-Mobile-Sample-App-iOS
 ```
 
 ### 2. Open in Xcode
 
 ```bash
-open ConnectPushSampleApp.xcodeproj
+open ConnectSampleApp/ConnectSampleApp.xcodeproj
 ```
+
+For the UIKit sample, open `ConnectSampleAppUIKit/ConnectSampleAppUIKit.xcodeproj`
+instead. It needs no credentials beyond the app key and collector URL, and no
+Apple Developer portal setup at all.
 
 Xcode will automatically resolve the Connect SDK Swift Package dependency.
 
 ### 3. Configure your credentials
 
-Open `ConnectPushSampleApp/Services/ConnectSDKManager.swift` and replace the
+Open `ConnectSampleApp/ConnectSampleApp/Services/ConnectSDKManager.swift` and replace the
 placeholder values:
 
 ```swift
@@ -64,34 +82,43 @@ private enum ConnectConfiguration {
 
 ### 4. Build and run
 
-Select the **ConnectPushSampleApp** scheme and run on a device or simulator.
+Select the **ConnectSampleApp** scheme and run on a device or simulator.
 
 ---
 
 ## Project structure
 
 ```
-ConnectPushSampleApp/
-  App/
-    AppDelegate.swift              # SDK init + APNs token forwarding (manual mode)
-    ConnectPushSampleApp.swift     # @main SwiftUI entry point
-  Services/
-    ConnectSDKManager.swift        # SDK lifecycle, authorization, identity
-    NotificationDelegate.swift     # UNUserNotificationCenterDelegate (manual mode)
-  Scenes/
-    PushDemo/
-      PushDemoView.swift           # Push authorization UI
-      Components/                  # Reusable UI components
-    IdentityDemo/
-      IdentityDemoView.swift       # Identity logging UI
-  Resources/
-    Assets.xcassets                # Acoustic brand colours and images
+Shared/                              # UI-free feature code, used by both apps
+  Identity/IdentityStore.swift       # Identity signalling and history
+  Behaviour/BehaviourStore.swift     # Behaviour capture calls
 
-ConnectNSE/                        # Notification Service Extension (rich push)
-ConnectNCE/                        # Notification Content Extension (custom UI)
-TestPayloads/                      # .apns files for simulator testing
+ConnectSampleApp/                    # SwiftUI sample — push, identity, behaviour
+  ConnectSampleApp/
+    App/
+      AppDelegate.swift              # SDK init + APNs token forwarding (manual mode)
+      ConnectSampleApp.swift         # @main SwiftUI entry point
+    Services/
+      ConnectSDKManager.swift        # SDK lifecycle, authorization, credentials
+      NotificationDelegate.swift     # UNUserNotificationCenterDelegate (manual mode)
+    Scenes/
+      PushDemo/                      # Push authorization UI
+      IdentityDemo/                  # Identity logging UI
+      BehaviourDemo/                 # Behaviour capture UI
+    Resources/
+      Assets.xcassets                # Acoustic brand colours and images
+  ConnectNSE/                        # Notification Service Extension (rich push)
+  ConnectNCE/                        # Notification Content Extension (custom UI)
+  TestPayloads/                      # .apns files for simulator testing
+
+ConnectSampleAppUIKit/               # UIKit sample — identity and behaviour only
+  ConnectSampleAppUIKit/
+    App/                             # AppDelegate + SceneDelegate, tab bar
+    Scenes/                          # Identity and Behaviour view controllers
+    Components/                      # Card and control helpers
+
 docs/
-  integration-guide.md             # Full integration guide
+  integration-guide.md               # Full integration guide
 ```
 
 ---
@@ -169,7 +196,7 @@ identity flows.
 
 ## Testing push notifications in the simulator
 
-Drag any `.apns` file from `TestPayloads/` onto the running simulator to
+Drag any `.apns` file from `ConnectSampleApp/TestPayloads/` onto the running simulator to
 deliver a test push notification:
 
 | Payload | Action |

@@ -1,0 +1,15 @@
+{
+  "originHash" : "23813928970219691f6fde6360532701bbcd733896e6647e58a43f261d156fb3",
+  "pins" : [
+    {
+      "identity" : "connect-sp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/go-acoustic/Connect-SP",
+      "state" : {
+        "revision" : "cea4a8aaffa84949b6b70faebafdd8094a9c2484",
+        "version" : "2.1.33"
+      }
+    }
+  ],
+  "version" : 3
+}

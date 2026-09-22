@@ -5,7 +5,7 @@ using the Acoustic Connect iOS SDK. It covers everything from Apple Developer
 portal setup through to testing on a device.
 
 For a working reference implementation, see the
-[ConnectPushSampleApp](../ConnectPushSampleApp/) in this repository.
+[ConnectSampleApp](../ConnectSampleApp/) in this repository.
 
 ---
 
