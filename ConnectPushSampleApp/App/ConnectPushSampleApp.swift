@@ -25,6 +25,10 @@ struct ConnectPushSampleApp: App {
                     .tabItem {
                         Label("Identity", systemImage: "person.crop.circle")
                     }
+                BehaviourDemoView()
+                    .tabItem {
+                        Label("Behaviour", systemImage: "chart.bar")
+                    }
             }
             .tint(Color("periwinkle"))
         }

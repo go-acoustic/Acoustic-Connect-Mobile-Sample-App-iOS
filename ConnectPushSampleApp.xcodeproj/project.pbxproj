@@ -703,7 +703,7 @@
 			repositoryURL = "https://github.com/go-acoustic/ConnectDebug-SP";
 			requirement = {
 				kind = exactVersion;
-				version = 2.1.31;
+				version = 2.1.32;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

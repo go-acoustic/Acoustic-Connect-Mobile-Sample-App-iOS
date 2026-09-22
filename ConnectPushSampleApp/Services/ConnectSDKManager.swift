@@ -50,27 +50,6 @@ final class ConnectSDKManager: ObservableObject {
     /// The current UNAuthorizationStatus for push notifications.
     @Published private(set) var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
-    // MARK: - Identity
-
-    /// A name/value pair used in the Identity demo form.
-    struct IdentityPair: Codable, Equatable, Identifiable {
-        var id: String { name }
-        var name: String
-        var value: String
-    }
-
-    /// The last five logged identity pairs, most recent first.
-    @Published private(set) var identityHistory: [IdentityPair] = {
-        guard
-            let data = UserDefaults.standard.data(forKey: "connectSampleIdentityPairs"),
-            let saved = try? JSONDecoder().decode([IdentityPair].self, from: data)
-        else { return [] }
-        return saved
-    }()
-
-    /// The result message from the most recent identity log call.
-    @Published private(set) var identityLogResult: String?
-
     // MARK: - Init
 
     private init() {
@@ -135,6 +114,18 @@ final class ConnectSDKManager: ObservableObject {
         )
     }
 
+    /// Enables the Connect SDK with behaviour capture only, leaving push off.
+    ///
+    /// Used by the UIKit sample, which ships without push entitlements or
+    /// notification extensions. `push` defaults to `.off`, so an analytics-only
+    /// host needs no push configuration at all.
+    func startAnalyticsOnly() {
+        ConnectSDK.shared.enable(
+            appKey: ConnectConfiguration.appKey,
+            postURL: ConnectConfiguration.postURL
+        )
+    }
+
     // MARK: - Authorization
 
     /// Requests push notification authorization from the user.
@@ -168,101 +159,6 @@ final class ConnectSDKManager: ObservableObject {
             } catch {
                 assertionFailure("[ConnectSample] Push not enabled — token not sent to SDK")
             }
-        }
-    }
-
-    // MARK: - Identity
-
-    /// Logs a `loggedIn` identity signal to associate the current device with a known user.
-    ///
-    /// Call this right after a successful sign-in so Connect can stitch the user's
-    /// session to their profile and any subsequent behavioral signals.
-    ///
-    /// - Parameters:
-    ///   - identifierName: The identifier type (for example, `"email"` or `"customerId"`).
-    ///   - identifierValue: The identifier value for the signed-in user.
-    ///   - additionalParameters: Optional context attached to the signal.
-    ///     Defaults to `["loginMethod": "email"]`.
-    ///
-    /// See: https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-sign-in-ios
-    func logUserLoggedIn(
-        identifierName: String,
-        identifierValue: String,
-        additionalParameters: [String: String] = ["loginMethod": "email"]
-    ) {
-        logIdentity(
-            identifierName: identifierName,
-            identifierValue: identifierValue,
-            signalType: "loggedIn",
-            additionalParameters: additionalParameters
-        )
-    }
-
-    /// Logs an `accountRegistered` identity signal when a new user completes registration.
-    ///
-    /// Call this once at the end of a successful sign-up flow so Connect can create
-    /// the user's profile and begin tracking activity against it.
-    ///
-    /// - Parameters:
-    ///   - identifierName: The identifier type (for example, `"email"` or `"customerId"`).
-    ///   - identifierValue: The identifier value for the newly registered user.
-    ///   - signalType: The signal name to record. Defaults to `"accountRegistered"`;
-    ///     override only when your Connect configuration uses a custom signal.
-    ///   - additionalParameters: Optional context attached to the signal.
-    ///     Defaults to `["registrationMethod": "email"]`.
-    ///
-    /// See: https://developer.goacoustic.com/acoustic-connect/docs/identify-users-at-registration-ios
-    func logUserRegistered(
-        identifierName: String,
-        identifierValue: String,
-        signalType: String = "accountRegistered",
-        additionalParameters: [String: String] = ["registrationMethod": "email"]
-    ) {
-        logIdentity(
-            identifierName: identifierName,
-            identifierValue: identifierValue,
-            signalType: signalType,
-            additionalParameters: additionalParameters
-        )
-    }
-
-    /// Trims and forwards an identity signal to the SDK, updates ``identityLogResult``,
-    /// and prepends the pair to ``identityHistory`` (capped at the five most recent).
-    ///
-    /// Empty or whitespace-only inputs are ignored so the demo form can't submit blanks.
-    /// The history is persisted to `UserDefaults` so it survives app restarts.
-    ///
-    /// - Parameters:
-    ///   - identifierName: The identifier type; trimmed before use.
-    ///   - identifierValue: The identifier value; trimmed before use.
-    ///   - signalType: The Connect identity signal name (for example, `"loggedIn"`).
-    ///   - additionalParameters: Context attached to the signal.
-    private func logIdentity(
-        identifierName: String,
-        identifierValue: String,
-        signalType: String,
-        additionalParameters: [String: String]
-    ) {
-        let trimmedName = identifierName.trimmingCharacters(in: .whitespaces)
-        let trimmedValue = identifierValue.trimmingCharacters(in: .whitespaces)
-        guard !trimmedName.isEmpty, !trimmedValue.isEmpty else { return }
-
-        let success = ConnectSDK.shared.identity.log(
-            identifierName: trimmedName,
-            identifierValue: trimmedValue,
-            signalType: signalType,
-            additionalParameters: additionalParameters
-        )
-        identityLogResult = success
-            ? "✓ \(trimmedName): \(trimmedValue)"
-            : "✗ Failed to log \(trimmedName)"
-
-        let pair = IdentityPair(name: trimmedName, value: trimmedValue)
-        var history = identityHistory.filter { $0.name != pair.name }
-        history.insert(pair, at: 0)
-        identityHistory = Array(history.prefix(5))
-        if let data = try? JSONEncoder().encode(identityHistory) {
-            UserDefaults.standard.set(data, forKey: "connectSampleIdentityPairs")
         }
     }
 }

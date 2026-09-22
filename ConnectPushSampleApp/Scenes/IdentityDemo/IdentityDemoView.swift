@@ -13,7 +13,7 @@ import SwiftUI
 
 struct IdentityDemoView: View {
 
-    @ObservedObject private var manager = ConnectSDKManager.shared
+    @ObservedObject private var store = IdentityStore.shared
 
     @State private var identifierName: String = ""
     @State private var identifierValue: String = ""
@@ -29,7 +29,7 @@ struct IdentityDemoView: View {
                 headerView
                 resultSection
                 inputCard
-                if manager.identityHistory.contains(where: { !$0.name.isEmpty && !$0.value.isEmpty }) {
+                if store.history.contains(where: { !$0.name.isEmpty && !$0.value.isEmpty }) {
                     recentsCard
                 }
             }
@@ -77,13 +77,13 @@ struct IdentityDemoView: View {
                 .textInputAutocapitalization(.never)
 
                 Button("Log Logged In With Email") {
-                    manager.logUserLoggedIn(identifierName: identifierName, identifierValue: identifierValue)
+                    store.logUserLoggedIn(identifierName: identifierName, identifierValue: identifierValue)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
                 
                 Button("Log Account Registered With Email") {
-                    manager.logUserRegistered(identifierName: identifierName, identifierValue: identifierValue)
+                    store.logUserRegistered(identifierName: identifierName, identifierValue: identifierValue)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
@@ -94,7 +94,7 @@ struct IdentityDemoView: View {
     // MARK: - Recents card
 
     private var recentsCard: some View {
-        let items = manager.identityHistory.filter { !$0.name.isEmpty && !$0.value.isEmpty }
+        let items = store.history.filter { !$0.name.isEmpty && !$0.value.isEmpty }
         return DemoCard(title: "Recent") {
             VStack(spacing: 0) {
                 ForEach(items) { pair in
@@ -133,7 +133,7 @@ struct IdentityDemoView: View {
 
     @ViewBuilder
     private var resultSection: some View {
-        if let result = manager.identityLogResult {
+        if let result = store.lastResult {
             DemoCard(title: "Last Result") {
                 Text(result)
                     .font(.subheadline)
