@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/go-acoustic/ConnectDebug-SP",
       "state" : {
-        "revision" : "fa401db594b51c5daff322f2fe29bce9b9ccabe7",
-        "version" : "2.1.39"
+        "revision" : "fc635e64f42168cfe459ad76df7ae7baeec3ea2d",
+        "version" : "2.1.40"
       }
     }
   ],
