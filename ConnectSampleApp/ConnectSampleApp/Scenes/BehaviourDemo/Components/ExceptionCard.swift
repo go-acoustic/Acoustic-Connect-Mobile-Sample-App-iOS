@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// `logNSExceptionEvent` demo.
@@ -34,7 +35,7 @@ struct ExceptionCard: View {
                     store.logHandledException()
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.exception)
+                .connectIdentifier(SampleID.Showcase.exception)
 
                 if let result = store.exceptionResult {
                     ResultText(text: result, identifier: SampleID.Showcase.exceptionResult)

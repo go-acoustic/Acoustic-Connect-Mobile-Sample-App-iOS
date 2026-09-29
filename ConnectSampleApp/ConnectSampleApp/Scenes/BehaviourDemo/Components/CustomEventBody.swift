@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// `logEvent` demo body, shared by the Showcase — inside a plain ``DemoCard`` —
@@ -33,14 +34,14 @@ struct CustomEventBody: View {
                 store.logCustomEvent()
             }
             .buttonStyle(PrimaryButtonStyle())
-            .accessibilityIdentifier(SampleID.Showcase.sendCustomEvent)
+            .connectIdentifier(SampleID.Showcase.sendCustomEvent)
 
             if let result = store.customEventResult {
                 Text(result)
                     .font(.system(.caption2, design: .monospaced))
                     .foregroundStyle(Color("violet"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityIdentifier(SampleID.Showcase.customEventResult)
+                    .connectIdentifier(SampleID.Showcase.customEventResult)
             }
         }
     }

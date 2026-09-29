@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Dialog capture demo. There is no SDK call here: the alert is presented
@@ -29,7 +30,7 @@ struct DialogCard: View {
                     isShowingDialog = true
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.dialog)
+                .connectIdentifier(SampleID.Showcase.dialog)
 
                 if let last {
                     ResultText(text: last, identifier: SampleID.Showcase.dialogResult)

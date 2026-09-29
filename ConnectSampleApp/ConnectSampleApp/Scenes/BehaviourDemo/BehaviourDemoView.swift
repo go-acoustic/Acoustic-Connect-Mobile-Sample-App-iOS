@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Behaviour tab root — a hub with two entry points into the analytics half of
@@ -86,7 +87,7 @@ struct BehaviourDemoView: View {
                     Text("Open Showcase")
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Behaviour.openShowcase)
+                .connectIdentifier(SampleID.Behaviour.openShowcase)
             }
         }
     }
@@ -108,7 +109,7 @@ struct BehaviourDemoView: View {
                     Text("Open Verification")
                 }
                 .buttonStyle(SecondaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Behaviour.openVerification)
+                .connectIdentifier(SampleID.Behaviour.openVerification)
             }
         }
     }

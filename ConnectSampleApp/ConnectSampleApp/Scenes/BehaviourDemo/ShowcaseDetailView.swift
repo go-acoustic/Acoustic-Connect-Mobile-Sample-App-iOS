@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// The screen the Showcase's "Screen views" card navigates to.
@@ -92,13 +93,13 @@ struct ShowcaseDetailView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(isAtCap)
-                .accessibilityIdentifier(SampleID.Showcase.pushDetail)
+                .connectIdentifier(SampleID.Showcase.pushDetail)
 
                 Button("Back") {
                     dismiss()
                 }
                 .buttonStyle(SecondaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.back)
+                .connectIdentifier(SampleID.Showcase.back)
             }
         }
     }

@@ -28,10 +28,15 @@ import Foundation
 /// that consume them; nothing else distinguishes them, and their values are as
 /// settled as the rest.
 ///
+/// In the SwiftUI sample, controls take their identifier through
+/// `.connectIdentifier(_:)`: it sets the accessibility identifier and also makes
+/// the control identifiable in session replay, which a plain
+/// `.accessibilityIdentifier(_:)` cannot do for a SwiftUI view.
+///
 /// ## Example
 /// ```swift
 /// Button("Open Showcase") { }
-///     .accessibilityIdentifier(SampleID.Behaviour.openShowcase)
+///     .connectIdentifier(SampleID.Behaviour.openShowcase)
 /// ```
 enum SampleID {
 

@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Runtime capture control. Shared by the Showcase and the Verification screen.
@@ -35,13 +36,13 @@ struct CaptureControlCard: View {
                     store.disableCapture()
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.captureDisable)
+                .connectIdentifier(SampleID.Showcase.captureDisable)
 
                 Button("Re-enable SDK") {
                     store.enableCapture()
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.captureEnable)
+                .connectIdentifier(SampleID.Showcase.captureEnable)
 
                 if let state = store.captureState {
                     ResultText(text: state, identifier: SampleID.Showcase.captureState)

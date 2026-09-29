@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 struct DemoTextField: View {
@@ -21,16 +22,14 @@ struct DemoTextField: View {
     /// The caption and the wrapping stack take the `_label` and `_container`
     /// suffixes React Native's `DemoTextField` adds, so one page object
     /// addresses the same three elements on every platform.
-    var identifier: String?
+    let identifier: String
 
     private var labelIdentifier: String {
-        guard let identifier else { return "" }
-        return SampleID.FieldPart.label(identifier)
+        SampleID.FieldPart.label(identifier)
     }
 
     private var containerIdentifier: String {
-        guard let identifier else { return "" }
-        return SampleID.FieldPart.container(identifier)
+        SampleID.FieldPart.container(identifier)
     }
 
     var body: some View {
@@ -38,9 +37,9 @@ struct DemoTextField: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(isDisabled ? Color("middleGrey") : Color("darkGrey"))
-                .accessibilityIdentifier(labelIdentifier)
+                .connectIdentifier(labelIdentifier)
             TextField(placeholder, text: $text)
-                .accessibilityIdentifier(identifier ?? "")
+                .connectIdentifier(identifier)
                 .font(.system(.subheadline, design: .monospaced))
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
@@ -57,6 +56,6 @@ struct DemoTextField: View {
         // Without `.contain`, SwiftUI hands the stack's identifier down to the
         // caption and the field, overwriting their own.
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier(containerIdentifier)
+        .connectIdentifier(containerIdentifier)
     }
 }

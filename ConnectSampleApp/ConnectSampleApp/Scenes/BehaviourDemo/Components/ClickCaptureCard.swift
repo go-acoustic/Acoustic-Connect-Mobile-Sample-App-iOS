@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Click capture demo. There is no SDK call here on purpose: once the SDK is
@@ -31,7 +32,7 @@ struct ClickCaptureCard: View {
                     taps += 1
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.tap)
+                .connectIdentifier(SampleID.Showcase.tap)
 
                 ResultText(text: "taps: \(taps)", identifier: SampleID.Showcase.tapCount)
             }

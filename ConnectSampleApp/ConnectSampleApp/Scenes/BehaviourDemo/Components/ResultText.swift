@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// The monospaced result line a card prints after it has been driven.
@@ -24,7 +25,7 @@ struct ResultText: View {
             .font(.system(.caption2, design: .monospaced))
             .foregroundStyle(Color("violet"))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityIdentifier(identifier)
+            .connectIdentifier(identifier)
     }
 }
 

@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Session-replay reference for a full-screen modal.
@@ -46,7 +47,7 @@ struct ReplayModalCard: View {
                     isPresented = true
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.ReplayModal.openOpaque)
+                .connectIdentifier(SampleID.ReplayModal.openOpaque)
             }
         }
         .fullScreenCover(isPresented: $isPresented) {
@@ -88,17 +89,17 @@ private struct ReplayModalContent: View {
                 actionCount += 1
             }
             .buttonStyle(PrimaryButtonStyle())
-            .accessibilityIdentifier(SampleID.ReplayModal.action)
+            .connectIdentifier(SampleID.ReplayModal.action)
 
             Button("Close", action: close)
                 .buttonStyle(SecondaryButtonStyle())
-                .accessibilityIdentifier(SampleID.ReplayModal.close)
+                .connectIdentifier(SampleID.ReplayModal.close)
 
             Text("Note: \(note.isEmpty ? "—" : note) · Primary action taps: \(actionCount)")
                 .font(.caption)
                 .foregroundStyle(Color("violet"))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityIdentifier(SampleID.ReplayModal.result)
+                .connectIdentifier(SampleID.ReplayModal.result)
         }
         .padding(20)
         .background(Color.white)

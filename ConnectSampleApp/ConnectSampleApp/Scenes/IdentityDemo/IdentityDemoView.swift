@@ -83,14 +83,14 @@ struct IdentityDemoView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
-                .accessibilityIdentifier(SampleID.Identity.sendIdentitySignal)
+                .connectIdentifier(SampleID.Identity.sendIdentitySignal)
 
                 Button("Log Account Registered With Email") {
                     store.logUserRegistered(identifierName: identifierName, identifierValue: identifierValue)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
-                .accessibilityIdentifier(SampleID.Identity.sendAccountRegisteredSignal)
+                .connectIdentifier(SampleID.Identity.sendAccountRegisteredSignal)
             }
         }
     }

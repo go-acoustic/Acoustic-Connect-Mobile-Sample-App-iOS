@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Showcase screen — the general-purpose demo of the SDK's behaviour capture,
@@ -89,7 +90,7 @@ struct ShowcaseView: View {
                     Text("Open a detail screen")
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.openDetail)
+                .connectIdentifier(SampleID.Showcase.openDetail)
             }
         }
     }

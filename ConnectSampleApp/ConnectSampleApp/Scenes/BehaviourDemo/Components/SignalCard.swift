@@ -8,6 +8,7 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// `logSignal` card — the on-device check that a nested signal payload reaches
@@ -35,13 +36,13 @@ struct SignalCard: View {
                     store.logSignal(.nested)
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.sendNestedSignal)
+                .connectIdentifier(SampleID.Showcase.sendNestedSignal)
 
                 Button("Send Flat Signal") {
                     store.logSignal(.flat)
                 }
                 .buttonStyle(SecondaryButtonStyle())
-                .accessibilityIdentifier(SampleID.Showcase.sendFlatSignal)
+                .connectIdentifier(SampleID.Showcase.sendFlatSignal)
 
                 if let result = store.signalResult {
                     ResultText(text: result, identifier: SampleID.Showcase.signalResult)
