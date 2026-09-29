@@ -19,7 +19,8 @@ import Foundation
 ///
 /// Most of what the SDK captures needs no call at all: screen views, taps and
 /// text entry are captured once the SDK is enabled. This type covers the
-/// explicit logging calls, starting with custom events.
+/// explicit calls: custom events, signals, handled exceptions and runtime
+/// capture control.
 @MainActor
 final class BehaviourStore: ObservableObject {
 
@@ -32,6 +33,18 @@ final class BehaviourStore: ObservableObject {
     /// The result message from the most recent custom-event call, or `nil`
     /// before one has been made.
     @Published private(set) var customEventResult: String?
+
+    /// The result message from the most recent signal call, or `nil` before
+    /// one has been made.
+    @Published private(set) var signalResult: String?
+
+    /// The result message from the most recent handled-exception report, or
+    /// `nil` before one has been made.
+    @Published private(set) var exceptionResult: String?
+
+    /// What the most recent capture-control call did, or `nil` before one has
+    /// been made.
+    @Published private(set) var captureState: String?
 
     // MARK: - Init
 
@@ -78,5 +91,137 @@ final class BehaviourStore: ObservableObject {
         customEventResult = success
             ? "✓ queued \(Self.customEventName) — read customEvent in the posted message"
             : "✗ failed to queue \(Self.customEventName)"
+    }
+
+    // MARK: - Signals
+
+    /// A signal as the signal card sends it.
+    enum Signal {
+
+        /// An object and an array of objects, plus a number and a null one
+        /// level down — the shape that has to survive serialisation intact.
+        case nested
+
+        /// Scalars only, the shape existing callers send.
+        case flat
+
+        /// The label the result line starts with.
+        var label: String {
+            switch self {
+            case .nested: return "nested"
+            case .flat: return "flat"
+            }
+        }
+
+        /// The payload handed to `logSignal`.
+        ///
+        /// Identical to `NESTED_PAYLOAD` / `FLAT_PAYLOAD` in the React Native
+        /// sample's `NestedSignalCard.tsx`, so the `signal` block in the posted
+        /// type-21 message can be compared across samples. `NSNull` is how a
+        /// JSON `null` is expressed in a Foundation dictionary.
+        var payload: [String: Any] {
+            switch self {
+            case .nested:
+                return [
+                    "signalContent": [
+                        "signalType": "pageview",
+                        "url": "https://app.example.com/behaviour-demo",
+                        "pageCategory": "behaviour-demo"
+                    ],
+                    "audience": [
+                        ["name": "Account Name", "value": "Acme Corp"],
+                        ["name": "Account ID", "value": "4815162342"]
+                    ],
+                    "cart": ["items": 3, "total": 24.99, "coupon": NSNull()]
+                ]
+            case .flat:
+                return [
+                    "signalType": "pageview",
+                    "pageCategory": "behaviour-demo"
+                ]
+            }
+        }
+
+        /// The payload as the result line prints it — React Native's
+        /// `JSON.stringify` output, written out because a Foundation
+        /// dictionary has no key order to serialise from.
+        var payloadDisplay: String {
+            switch self {
+            case .nested:
+                return #"{"signalContent":{"signalType":"pageview","url":"https://app.example.com/behaviour-demo","pageCategory":"behaviour-demo"},"audience":[{"name":"Account Name","value":"Acme Corp"},{"name":"Account ID","value":"4815162342"}],"cart":{"items":3,"total":24.99,"coupon":null}}"#
+            case .flat:
+                return #"{"signalType":"pageview","pageCategory":"behaviour-demo"}"#
+            }
+        }
+    }
+
+    /// Logs `signal` and records the outcome in ``signalResult``.
+    ///
+    /// A `✓` means the SDK accepted the signal for posting, not that it was
+    /// delivered. Read it under `signal` in the type-21 message posted to the
+    /// collector.
+    ///
+    /// - Parameter signal: Which payload to send.
+    func logSignal(_ signal: Signal) {
+        let queued = ConnectCustomEvent.sharedInstance().logSignal(
+            signal.payload,
+            level: kConnectMonitoringLevelType.connectMonitoringLevelCellularAndWiFi
+        )
+        signalResult = "\(queued ? "✓" : "✗") \(signal.label) — \(signal.payloadDisplay)"
+    }
+
+    // MARK: - Exceptions
+
+    /// An error the app catches and recovers from — invisible to the SDK
+    /// unless the app reports it. The message matches the React Native
+    /// sample's `ExceptionCard.tsx`.
+    private struct ShowcaseError: LocalizedError {
+        var errorDescription: String? { "Showcase: handled exception" }
+    }
+
+    /// Throws an error, catches it, and reports it with `unhandled` set to
+    /// `false`, recording the outcome in ``exceptionResult``.
+    ///
+    /// A Swift `Error` is not an `NSException`, so reporting one means wrapping
+    /// it: the error's type becomes the exception name and its description the
+    /// reason. Crashes and uncaught exceptions are reported by the SDK on its
+    /// own; this is the case it cannot see.
+    func logHandledException() {
+        do {
+            throw ShowcaseError()
+        } catch {
+            let exception = NSException(
+                name: NSExceptionName(String(describing: type(of: error))),
+                reason: error.localizedDescription
+            )
+            let queued = ConnectCustomEvent.sharedInstance().logNSExceptionEvent(
+                exception,
+                dataDictionary: [:],
+                isUnhandled: false
+            )
+            exceptionResult = "\(queued ? "✓" : "✗") queued exception \"\(error.localizedDescription)\""
+        }
+    }
+
+    // MARK: - Capture control
+
+    /// Disables the SDK and records the resulting state in ``captureState``.
+    ///
+    /// Capture should stop until ``enableCapture()``: navigate a few screens,
+    /// re-enable, and check that nothing from the disabled stretch reaches the
+    /// collector, including in the posts that follow re-enabling.
+    func disableCapture() {
+        ConnectSDK.shared.disable()
+        captureState = """
+            disable() — isEnabled is \(ConnectSDK.shared.isEnabled); \
+            now navigate and check for further layout captures
+            """
+    }
+
+    /// Enables the SDK again the way the sample first started it, and records
+    /// the resulting state in ``captureState``.
+    func enableCapture() {
+        ConnectSDKManager.shared.reenable()
+        captureState = "enable() — isEnabled is \(ConnectSDK.shared.isEnabled)"
     }
 }

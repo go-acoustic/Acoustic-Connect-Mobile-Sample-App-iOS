@@ -30,7 +30,14 @@ struct ShowcaseView: View {
             VStack(spacing: 20) {
                 howToReadCard
                 screenViewsCard
+                ClickCaptureCard()
+                TextCaptureCard()
                 customEventCard
+                SignalCard()
+                ExceptionCard()
+                DialogCard()
+                ReplayModalCard(returnScreenName: BehaviourRoute.showcase.screenName)
+                CaptureControlCard()
             }
             .padding(.horizontal)
             .padding(.top, 20)
@@ -51,8 +58,8 @@ struct ShowcaseView: View {
                     there. iOS posts when the app is backgrounded.
                     """)
                 Text("""
-                    The first cards need no SDK call at all — enabling the SDK is \
-                    what captures them.
+                    The first three cards need no SDK call at all — enabling the \
+                    SDK is what captures them.
                     """)
             }
             .font(.subheadline)

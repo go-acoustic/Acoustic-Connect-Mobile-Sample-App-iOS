@@ -54,6 +54,9 @@ struct DemoTextField: View {
                         .stroke(Color("middleGrey"), lineWidth: 1)
                 )
         }
+        // Without `.contain`, SwiftUI hands the stack's identifier down to the
+        // caption and the field, overwriting their own.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(containerIdentifier)
     }
 }

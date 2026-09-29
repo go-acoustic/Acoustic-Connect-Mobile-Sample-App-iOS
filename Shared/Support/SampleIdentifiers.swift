@@ -60,10 +60,6 @@ enum SampleID {
     }
 
     /// Showcase screen and its recursive detail screen.
-    ///
-    /// The screen-view, detail-chain and custom-event members are in use. The
-    /// click, text, signal, exception, dialog and capture-control members are
-    /// **Reserved** for the Showcase cards that arrive next.
     enum Showcase {
         static let openDetail = "btn_showcase_open_detail"
         static let tap = "btn_showcase_tap"
@@ -101,17 +97,24 @@ enum SampleID {
         static let accessibilityField = "a11y_field"
     }
 
-    /// **Reserved.** Replay-modal controls, which arrive with the replay-modal
-    /// cards.
+    /// Replay-modal controls. The opaque card is on Showcase;
+    /// ``openTransparent`` is **Reserved** for the transparent card, which
+    /// arrives with the Verification screen.
     ///
     /// React Native's `components/ReplayModalCard.tsx` carries no `testID` at
     /// all, so these names originate here rather than being mirrored. They are
     /// a proposal for the shared end-to-end suite to adopt across all three
     /// samples. If that suite settles on different names, change them here and
     /// in React Native rather than letting the same control carry three names.
+    ///
+    /// ``result`` is the status line that echoes the note and the action count,
+    /// and the modal's note field and action button are named too, so nothing
+    /// inside the modal has to be found by position.
     enum ReplayModal {
         static let openOpaque = "btn_open_replay_modal_opaque"
         static let openTransparent = "btn_open_replay_modal_transparent"
+        static let note = "field_replay_modal_note"
+        static let action = "btn_replay_modal_action"
         static let close = "btn_close_replay_modal"
         static let result = "txt_replay_modal_result"
     }

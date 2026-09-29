@@ -116,3 +116,37 @@ func makeLabeledTextField(
     stack.accessibilityIdentifier = identifier.map(SampleID.FieldPart.container)
     return stack
 }
+
+/// Monospaced violet label for the line a card prints after it has been
+/// driven, matching `ResultText` in the SwiftUI sample. Starts hidden and
+/// empty; set its text once there is a result.
+///
+/// - Parameter identifier: Accessibility identifier from ``SampleID``, so the
+///   e2e suite can read the result without matching on layout.
+/// - Returns: The configured label.
+func makeResultLabel(identifier: String) -> UILabel {
+    let label = makeBodyLabel("", style: .caption2, identifier: identifier)
+    label.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
+    label.textColor = UIColor(named: "violet")
+    label.isHidden = true
+    return label
+}
+
+/// Light-grey rounded box around a view, for payloads, hints and results.
+///
+/// - Parameter content: The view to inset.
+/// - Returns: The box, with `content` inset 10 points on every side.
+func makeInsetBox(containing content: UIView) -> UIView {
+    let box = UIView()
+    box.backgroundColor = UIColor(named: "lightGrey")
+    box.layer.cornerRadius = 8
+    content.translatesAutoresizingMaskIntoConstraints = false
+    box.addSubview(content)
+    NSLayoutConstraint.activate([
+        content.topAnchor.constraint(equalTo: box.topAnchor, constant: 10),
+        content.leadingAnchor.constraint(equalTo: box.leadingAnchor, constant: 10),
+        content.trailingAnchor.constraint(equalTo: box.trailingAnchor, constant: -10),
+        content.bottomAnchor.constraint(equalTo: box.bottomAnchor, constant: -10)
+    ])
+    return box
+}

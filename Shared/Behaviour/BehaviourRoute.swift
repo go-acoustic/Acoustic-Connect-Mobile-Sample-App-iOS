@@ -87,4 +87,11 @@ enum BehaviourRoute: Hashable {
 
     /// The screen name of the Behaviour tab's root, logged when the hub appears.
     static let hubScreenName = "Behaviour"
+
+    /// The screen name logged for the replay modal.
+    ///
+    /// The modal is presented rather than pushed, so it is not a route, but iOS
+    /// still logs a screen view for the controller that presents it, and would
+    /// name that one after its class.
+    static let replayModalScreenName = "Replay modal"
 }

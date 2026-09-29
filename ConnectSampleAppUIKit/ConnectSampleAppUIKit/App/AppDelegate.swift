@@ -12,7 +12,7 @@ import Connect
 import UIKit
 
 /// Analytics-only sample. No push entitlements, no notification extensions —
-/// `ConnectSDK.enable(appKey:postURL:)` leaves push off by default, so nothing
+/// `ConnectConfig` leaves push off by default, so nothing
 /// here needs a certificate or a provisioning profile.
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {

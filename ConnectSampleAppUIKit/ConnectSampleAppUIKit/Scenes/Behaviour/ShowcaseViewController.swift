@@ -29,7 +29,18 @@ final class ShowcaseViewController: CardListViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCards([howToReadCard(), screenViewsCard(), customEventCard()])
+        setCards([
+            howToReadCard(),
+            screenViewsCard(),
+            ClickCaptureCardBody.makeCard(),
+            TextCaptureCardBody.makeCard(),
+            customEventCard(),
+            SignalCardBody.makeCard(),
+            ExceptionCardBody.makeCard(),
+            DialogCardBody.makeCard(presenter: self),
+            ReplayModalCardBody.makeCard(presenter: self),
+            CaptureControlCardBody.makeCard()
+        ])
     }
 
     // MARK: - Cards
@@ -44,8 +55,8 @@ final class ShowcaseViewController: CardListViewController {
                     there. iOS posts when the app is backgrounded.
                     """),
                 makeBodyLabel("""
-                    The first cards need no SDK call at all — enabling the SDK is \
-                    what captures them.
+                    The first three cards need no SDK call at all — enabling the \
+                    SDK is what captures them.
                     """)
             ]
         )
