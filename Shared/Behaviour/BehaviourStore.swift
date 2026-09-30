@@ -20,7 +20,7 @@ import Foundation
 /// Most of what the SDK captures needs no call at all: screen views, taps and
 /// text entry are captured once the SDK is enabled. This type covers the
 /// explicit calls: custom events, signals, handled exceptions, identity
-/// defaults and runtime capture control.
+/// defaults, direct screen views and runtime capture control.
 @MainActor
 final class BehaviourStore: ObservableObject {
 
@@ -49,6 +49,10 @@ final class BehaviourStore: ObservableObject {
     /// The result message from the most recent identity-defaults call, or
     /// `nil` before one has been made.
     @Published private(set) var identityDefaultsResult: String?
+
+    /// The most recent direct screen-view sends, newest first, at most
+    /// ``screenViewLogLimit``.
+    @Published private(set) var screenViewLog: [ScreenViewLogEntry] = []
 
     // MARK: - Init
 
@@ -237,6 +241,76 @@ final class BehaviourStore: ObservableObject {
             additionalParameters: ["registrationMethod": "email"]
         )
         identityDefaultsResult = "\(queued ? "✓" : "✗") explicit — expect registrationMethod: email"
+    }
+
+    // MARK: - Screen views
+
+    /// One direct screen-view send, as the exact-name card lists it.
+    struct ScreenViewLogEntry: Identifiable, Hashable {
+        let id = UUID()
+
+        /// The case sent.
+        let caseID: String
+
+        /// Whether the SDK accepted the message for the queue.
+        let queued: Bool
+
+        /// The name as ``ScreenViewCases/describe(_:)`` prints it.
+        let shown: String
+
+        /// The line the card prints.
+        var line: String { "\(queued ? "✓" : "✗") \(caseID) → \(shown)" }
+    }
+
+    /// How many sends the exact-name card keeps.
+    static let screenViewLogLimit = 12
+
+    /// The referrer the exact-name card sends, matching React Native's
+    /// `DirectScreenViewCard.tsx`.
+    static let directScreenViewReferrer = "Screen View Diagnostics"
+
+    /// The class the direct call reports. React Native's bridge sends
+    /// `ReactNative_<name>`; these apps name the screen that sends it.
+    static let directScreenViewClass = "ScreenViews"
+
+    /// Logs a type-2 LOAD whose name is exactly `name`, bypassing navigation.
+    ///
+    /// Navigation cannot carry an empty or `nil` name — those two cases are
+    /// only reachable this way.
+    ///
+    /// - Parameters:
+    ///   - name: The logical page name, sent as is. `nil` is deliberate for the
+    ///     null case.
+    ///   - referrer: The referrer to send.
+    /// - Returns: Whether the SDK accepted the message for the queue — not that
+    ///   the collector received it.
+    @discardableResult
+    func logScreenViewDirect(name: String?, referrer: String) -> Bool {
+        ConnectCustomEvent.sharedInstance().logScreenViewContext(
+            name,
+            withClass: Self.directScreenViewClass,
+            applicationContext: .load,
+            referrer: referrer
+        )
+    }
+
+    /// Sends one case through the direct call and records it in
+    /// ``screenViewLog``.
+    ///
+    /// - Parameter screenViewCase: The case to send.
+    func logScreenViewDirect(_ screenViewCase: ScreenViewCase) {
+        let queued = logScreenViewDirect(name: screenViewCase.name, referrer: Self.directScreenViewReferrer)
+        let entry = ScreenViewLogEntry(
+            caseID: screenViewCase.id,
+            queued: queued,
+            shown: ScreenViewCases.describe(screenViewCase.name)
+        )
+        screenViewLog = Array(([entry] + screenViewLog).prefix(Self.screenViewLogLimit))
+    }
+
+    /// Sends every direct case, in table order.
+    func logAllScreenViewsDirect() {
+        ScreenViewCases.direct.forEach(logScreenViewDirect(_:))
     }
 
     // MARK: - Capture control

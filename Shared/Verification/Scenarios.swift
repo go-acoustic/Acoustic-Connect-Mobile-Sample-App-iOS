@@ -218,8 +218,8 @@ enum Scenarios {
         key: "screenview-referrer",
         title: "Screenview referrer points at the previous screen",
         action: """
-            Push and pop the Showcase detail chain and read the referrer on \
-            each screenview.
+            Move between screens in Screen Views and read the referrer on each \
+            screenview.
             """,
         expected: """
             referrer is the screen you came from. The iOS bug set it to the \

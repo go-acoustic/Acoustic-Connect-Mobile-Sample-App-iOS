@@ -37,7 +37,7 @@ struct ShowcaseView: View {
                 SignalCard()
                 ExceptionCard()
                 DialogCard()
-                ReplayModalCard(returnScreenName: BehaviourRoute.showcase.screenName)
+                ReplayModalCard()
                 CaptureControlCard()
             }
             .padding(.horizontal)

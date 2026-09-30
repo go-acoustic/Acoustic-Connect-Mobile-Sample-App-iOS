@@ -22,11 +22,8 @@ import Foundation
 /// other, and the file doubles as the reviewable list of what the contract
 /// covers.
 ///
-/// The whole contract is declared here at once, ahead of the screens that use
-/// it, so it can be diffed against the React Native sample in one place. Groups
-/// marked **Reserved** have no consuming view yet and arrive with the screens
-/// that consume them; nothing else distinguishes them, and their values are as
-/// settled as the rest.
+/// The whole contract is declared here in one place, so it can be diffed
+/// against the React Native sample at once.
 ///
 /// In the SwiftUI sample, controls take their identifier through
 /// `.connectIdentifier(_:)`: it sets the accessibility identifier and also makes
@@ -137,8 +134,8 @@ enum SampleID {
         static let webView = "webview_post"
     }
 
-    /// **Reserved.** Screen-views screen and the per-case screen it navigates
-    /// to, which arrive with those screens alongside ``ScreenViewCases``.
+    /// Screen Views screen and the per-case screen it navigates to. The cases
+    /// themselves are in ``ScreenViewCases``.
     enum ScreenViews {
         static let open = "btn_open_screen_views"
         static let sendAll = "btn_screenview_send_all"

@@ -9,11 +9,9 @@
 //
 
 //
-// Consumed by the Screen views screen and its per-case screen, which arrive in
-// a later change. The table lands ahead of them deliberately: it is the part of
-// the contract that has to match React Native byte for byte, so it is worth
-// reviewing against `screenViewCases.ts` on its own rather than buried in a
-// screen's diff.
+// Consumed by the Screen Views screen and its per-case screen. The table is the
+// part of the contract that has to match React Native byte for byte, so review
+// it against `screenViewCases.ts` on its own.
 //
 
 import Foundation
@@ -66,7 +64,9 @@ struct ScreenViewCase: Identifiable, Hashable {
     /// `nil` is deliberate: the Android bridge stringifies a null logical page
     /// name, so it should arrive as the literal text `"null"` rather than as
     /// absent. iOS drops the message instead — a platform difference this case
-    /// exists to record.
+    /// exists to record. iOS drops an empty name the same way: the SDK refuses
+    /// a missing or empty name and the direct call returns `false`, so neither
+    /// reaches the collector from these apps.
     let name: String?
 
     /// What this case probes on the server side.
@@ -183,6 +183,55 @@ enum ScreenViewCases {
     /// Cases that must go through the direct call to keep the exact string.
     static let direct: [ScreenViewCase] = all.filter {
         $0.delivery == .direct || $0.delivery == .both
+    }
+
+    /// The first navigation case other than `screenViewCase`, which a case
+    /// screen pushes to build a deeper stack.
+    ///
+    /// Deliberately not "the next case in order": this is React Native's
+    /// `NAV_CASES.find((entry) => entry.id !== caseId)`, so all three samples
+    /// offer the same push from the same screen. The button exists to deepen
+    /// the stack, not to walk the list.
+    ///
+    /// - Parameter screenViewCase: The case on screen.
+    /// - Returns: The case to push next, or `nil` if there is none.
+    static func next(after screenViewCase: ScreenViewCase) -> ScreenViewCase? {
+        navigation.first { $0.id != screenViewCase.id }
+    }
+
+    /// A name as the screens print it, so a blank or null one is visible rather
+    /// than invisible. Matches `describeName` in the React Native sample's
+    /// `DirectScreenViewCard.tsx`.
+    ///
+    /// - Parameter name: The name to describe.
+    /// - Returns: The printable form.
+    static func describe(_ name: String?) -> String {
+        guard let name else { return "(null)" }
+        if name.isEmpty { return "(empty string)" }
+        if name.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "(whitespace ×\(name.utf16.count))"
+        }
+        if name.utf16.count > 48 {
+            // React Native slices the first 45 UTF-16 units and counts the whole
+            // name in UTF-16 units; this does the same, but stops at the last
+            // whole character that fits, so it never splits a surrogate pair
+            // or a grapheme. For ASCII names the output is identical.
+            return "\(prefix(of: name, utf16Units: 45))… (\(name.utf16.count) chars)"
+        }
+        return name
+    }
+
+    /// The longest run of whole characters from the start of `name` that fits
+    /// in `limit` UTF-16 units.
+    private static func prefix(of name: String, utf16Units limit: Int) -> Substring {
+        var units = 0
+        var end = name.startIndex
+        for character in name {
+            units += character.utf16.count
+            guard units <= limit else { break }
+            end = name.index(after: end)
+        }
+        return name[..<end]
     }
 
     /// Looks a case up by id, for a screen restored from its route.

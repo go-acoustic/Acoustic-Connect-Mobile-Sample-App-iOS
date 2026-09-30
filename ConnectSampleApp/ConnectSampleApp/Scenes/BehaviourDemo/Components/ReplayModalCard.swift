@@ -36,14 +36,6 @@ struct ReplayModalCard: View {
     /// backdrop.
     var transparent = false
 
-    /// The screen name to restore when the modal closes — the screen the card
-    /// sits on.
-    ///
-    /// Dismissing a full-screen cover does not re-run the presenting screen's
-    /// `onAppear`, so without this the next screen view would still carry the
-    /// modal's name.
-    let returnScreenName: String
-
     @State private var isPresented = false
 
     var body: some View {
@@ -66,7 +58,6 @@ struct ReplayModalCard: View {
         }
         .fullScreenCover(isPresented: $isPresented) {
             ReplayModalContent(transparent: false) {
-                SampleScreenNaming.nameCurrentScreen(returnScreenName)
                 isPresented = false
             }
         }
@@ -77,10 +68,8 @@ struct ReplayModalCard: View {
             isPresented = true
             return
         }
-        let returnScreenName = returnScreenName
         OverFullScreenPresenter.present { dismiss in
             ReplayModalContent(transparent: true) {
-                SampleScreenNaming.nameCurrentScreen(returnScreenName)
                 dismiss()
             }
         }
@@ -182,8 +171,8 @@ private struct ReplayModalContent: View {
 
 #Preview {
     VStack(spacing: 20) {
-        ReplayModalCard(returnScreenName: BehaviourRoute.showcase.screenName)
-        ReplayModalCard(transparent: true, returnScreenName: BehaviourRoute.showcase.screenName)
+        ReplayModalCard()
+        ReplayModalCard(transparent: true)
     }
     .padding()
 }

@@ -25,9 +25,8 @@ import Foundation
 /// SwiftUI sample, the UIKit sample and React Native log the same screen names
 /// in the same order.
 ///
-/// The target shape is React Native's seven routes. This type carries the four
-/// that both samples render today; `ScreenViews` and `Case` arrive with the
-/// screens that push them, so no route here is unreachable.
+/// The target shape is React Native's seven routes, and this type carries all
+/// of them.
 ///
 /// ## Example
 /// ```swift
@@ -60,6 +59,16 @@ enum BehaviourRoute: Hashable {
     /// because not every host app carries `react-native-webview`.
     case webViewPost
 
+    /// The screen-name test surface, pushed from the Verification screen.
+    case screenViews
+
+    /// One screen-name case, arrived at by navigation, so the screen view is
+    /// logged from the route — the path a customer's app takes.
+    ///
+    /// - Parameter screenViewCase: The case whose name this screen logs. Only
+    ///   navigation cases reach here, so its name is never `nil`.
+    case screenViewCase(ScreenViewCase)
+
     /// How deep the detail chain may go.
     ///
     /// A few levels show the referrer chain advancing; an unbounded stack is
@@ -80,6 +89,8 @@ enum BehaviourRoute: Hashable {
         case .verification: return "Verification"
         case .showcaseDetail(let name, _): return name
         case .webViewPost: return "WebViewPost"
+        case .screenViews: return "Screen Views"
+        case .screenViewCase(let screenViewCase): return screenViewCase.name ?? ""
         }
     }
 
@@ -90,6 +101,10 @@ enum BehaviourRoute: Hashable {
         case .verification: return "Verification"
         case .showcaseDetail(let name, _): return name
         case .webViewPost: return "WebView POST"
+        case .screenViews: return "Screen Views"
+        // The case label, never the logged name: a 300-character or emoji name
+        // would make the header unreadable, and the screen body prints it anyway.
+        case .screenViewCase(let screenViewCase): return screenViewCase.label
         }
     }
 

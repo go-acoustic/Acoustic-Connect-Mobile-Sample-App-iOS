@@ -28,8 +28,7 @@ final class ReplayModalCardBody: UIStackView {
     /// The body in its card.
     ///
     /// - Parameters:
-    ///   - presenter: The screen that presents the modal, and whose name is
-    ///     logged again once it closes.
+    ///   - presenter: The screen that presents the modal.
     ///   - transparent: Whether the screen beneath shows through the modal.
     static func makeCard(presenter: CardListViewController, transparent: Bool = false) -> CardView {
         CardView(
@@ -68,18 +67,7 @@ final class ReplayModalCardBody: UIStackView {
 
     private func openModal() {
         let modal = ReplayModalViewController(transparent: transparent)
-        if transparent {
-            // An over-full-screen presentation leaves the presenter in place, so
-            // its viewWillAppear does not run when the modal closes; name it here.
-            modal.modalPresentationStyle = .overFullScreen
-            modal.onClose = { [weak presenter] in
-                if let name = presenter?.screenName {
-                    SampleScreenNaming.nameCurrentScreen(name)
-                }
-            }
-        } else {
-            modal.modalPresentationStyle = .fullScreen
-        }
+        modal.modalPresentationStyle = transparent ? .overFullScreen : .fullScreen
         presenter?.present(modal, animated: true)
     }
 }
@@ -93,9 +81,6 @@ final class ReplayModalCardBody: UIStackView {
 /// never registered can be told apart from one the SDK failed to capture.
 @MainActor
 private final class ReplayModalViewController: UIViewController {
-
-    /// Runs after the modal is dismissed.
-    var onClose: (() -> Void)?
 
     private let transparent: Bool
     private let noteField = UITextField()
@@ -159,10 +144,7 @@ private final class ReplayModalViewController: UIViewController {
                 title: "Close",
                 identifier: SampleID.ReplayModal.close,
                 action: UIAction { [weak self] _ in
-                    // Taken before dismissing: the controller may be released
-                    // by the time the completion runs.
-                    let onClose = self?.onClose
-                    self?.dismiss(animated: true) { onClose?() }
+                    self?.dismiss(animated: true)
                 }
             ),
             statusLabel

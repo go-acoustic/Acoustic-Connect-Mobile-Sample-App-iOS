@@ -25,14 +25,20 @@ import SwiftUI
 /// React Native sample behaves.
 struct VerificationView: View {
 
-    private static let returnScreenName = BehaviourRoute.verification.screenName
-
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 howToReadCard
 
-                ScenarioCardView(scenario: Scenarios.screenViewReferrer)
+                ScenarioCardView(scenario: Scenarios.screenViewReferrer) {
+                    NavigationLink(
+                        destination: BehaviourRoute.screenViews.screen(ScreenViewsView())
+                    ) {
+                        Text("Open Screen Views")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .connectIdentifier(SampleID.ScreenViews.open)
+                }
 
                 ScenarioCardView(scenario: Scenarios.customEventValueTypes) {
                     CustomEventBody()
@@ -67,9 +73,9 @@ struct VerificationView: View {
                         """)
                 }
 
-                ReplayModalCard(returnScreenName: Self.returnScreenName)
+                ReplayModalCard()
 
-                ReplayModalCard(transparent: true, returnScreenName: Self.returnScreenName)
+                ReplayModalCard(transparent: true)
 
                 ScenarioCardView(scenario: Scenarios.androidCompileClasspath) {
                     Text("""

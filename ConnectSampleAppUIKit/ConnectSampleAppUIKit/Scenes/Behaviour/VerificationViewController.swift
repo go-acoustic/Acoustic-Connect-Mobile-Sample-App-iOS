@@ -34,7 +34,16 @@ final class VerificationViewController: CardListViewController {
         super.viewDidLoad()
         setCards([
             howToReadCard(),
-            makeScenarioCard(scenario: Scenarios.screenViewReferrer),
+            makeScenarioCard(
+                scenario: Scenarios.screenViewReferrer,
+                body: [
+                    makeSecondaryButton(
+                        title: "Open Screen Views",
+                        identifier: SampleID.ScreenViews.open,
+                        action: UIAction { [weak self] _ in self?.pushScreenViews() }
+                    )
+                ]
+            ),
             makeScenarioCard(scenario: Scenarios.customEventValueTypes, body: [CustomEventBodyView()]),
             SignalCardBody.makeCard(),
             IdentityDefaultsCardBody.makeCard(),
@@ -117,6 +126,12 @@ final class VerificationViewController: CardListViewController {
     }
 
     // MARK: - Navigation
+
+    private func pushScreenViews() {
+        let screen = ScreenViewsViewController()
+        screen.title = BehaviourRoute.screenViews.title
+        navigationController?.pushViewController(screen, animated: true)
+    }
 
     private func pushWebViewPost() {
         let screen = WebViewPostViewController()
