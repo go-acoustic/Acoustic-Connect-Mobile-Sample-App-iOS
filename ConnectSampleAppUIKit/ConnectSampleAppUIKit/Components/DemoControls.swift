@@ -150,3 +150,14 @@ func makeInsetBox(containing content: UIView) -> UIView {
     ])
     return box
 }
+
+/// A card's hint — what to look for in the posted message — in a light-grey
+/// box, matching `HintText` in the SwiftUI sample.
+///
+/// - Parameter text: The hint.
+/// - Returns: The box holding the hint.
+func makeHintBox(_ text: String) -> UIView {
+    let hint = makeBodyLabel(text, style: .caption1)
+    hint.textColor = UIColor(named: "violet")
+    return makeInsetBox(containing: hint)
+}

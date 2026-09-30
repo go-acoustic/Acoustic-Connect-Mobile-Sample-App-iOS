@@ -19,8 +19,8 @@ import Foundation
 ///
 /// Most of what the SDK captures needs no call at all: screen views, taps and
 /// text entry are captured once the SDK is enabled. This type covers the
-/// explicit calls: custom events, signals, handled exceptions and runtime
-/// capture control.
+/// explicit calls: custom events, signals, handled exceptions, identity
+/// defaults and runtime capture control.
 @MainActor
 final class BehaviourStore: ObservableObject {
 
@@ -45,6 +45,10 @@ final class BehaviourStore: ObservableObject {
     /// What the most recent capture-control call did, or `nil` before one has
     /// been made.
     @Published private(set) var captureState: String?
+
+    /// The result message from the most recent identity-defaults call, or
+    /// `nil` before one has been made.
+    @Published private(set) var identityDefaultsResult: String?
 
     // MARK: - Init
 
@@ -201,6 +205,38 @@ final class BehaviourStore: ObservableObject {
             )
             exceptionResult = "\(queued ? "✓" : "✗") queued exception \"\(error.localizedDescription)\""
         }
+    }
+
+    // MARK: - Identity defaults
+
+    /// Logs an identity with both optional arguments omitted, so the SDK
+    /// supplies its own defaults, and records the outcome in
+    /// ``identityDefaultsResult``.
+    ///
+    /// The native API defaults `signalType` to `pageView` and adds no
+    /// parameters. React Native's bridge defaults differently — `loggedIn`
+    /// paired with `loginMethod` — which is the fix its matching scenario
+    /// covers; that bridge is not in this app, so the native defaults are what
+    /// the collector should receive here.
+    func logIdentityDefaulted() {
+        let queued = ConnectSDK.shared.identity.log(
+            identifierName: "Email",
+            identifierValue: "defaults@example.com"
+        )
+        identityDefaultsResult = "\(queued ? "✓" : "✗") defaulted — expect signalType: pageView"
+    }
+
+    /// Logs an explicit `accountRegistered` identity with its
+    /// `registrationMethod`, the contrast case for ``logIdentityDefaulted()``,
+    /// and records the outcome in ``identityDefaultsResult``.
+    func logIdentityExplicit() {
+        let queued = ConnectSDK.shared.identity.log(
+            identifierName: "Email",
+            identifierValue: "explicit@example.com",
+            signalType: "accountRegistered",
+            additionalParameters: ["registrationMethod": "email"]
+        )
+        identityDefaultsResult = "\(queued ? "✓" : "✗") explicit — expect registrationMethod: email"
     }
 
     // MARK: - Capture control

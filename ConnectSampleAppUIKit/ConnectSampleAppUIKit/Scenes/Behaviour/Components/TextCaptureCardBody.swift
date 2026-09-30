@@ -55,13 +55,11 @@ final class TextCaptureCardBody: UIStackView {
             )
         )
 
-        let hint = makeBodyLabel("""
+        addArrangedSubview(makeHintBox("""
             The sample config masks values starting with SECRET-: capitals \
             become X, lowercase x, digits 9 and symbols #. Compare the two \
             fields in the posted layout message.
-            """, style: .caption1)
-        hint.textColor = UIColor(named: "violet")
-        addArrangedSubview(makeInsetBox(containing: hint))
+            """))
     }
 
     @available(*, unavailable)

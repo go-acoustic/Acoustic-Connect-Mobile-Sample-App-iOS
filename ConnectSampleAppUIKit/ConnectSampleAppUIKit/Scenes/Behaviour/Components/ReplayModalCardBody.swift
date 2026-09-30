@@ -11,28 +11,36 @@
 
 import UIKit
 
-/// Session-replay reference for a full-screen modal, matching
-/// `ReplayModalCard` in the SwiftUI sample.
+/// Session-replay reference for a full-screen modal, opaque or transparent,
+/// matching `ReplayModalCard` in the SwiftUI sample.
 ///
 /// A modal is presented by its own view controller rather than pushed onto the
 /// navigation stack, so session replay has to resolve its controls outside the
-/// stack the rest of the app lives in.
+/// stack the rest of the app lives in. The two variants mirror React Native's
+/// `transparent` prop: an opaque `.fullScreen` presentation, or
+/// `.overFullScreen` with the screen beneath showing through a dimmed backdrop.
 @MainActor
 final class ReplayModalCardBody: UIStackView {
 
-    private weak var presenter: UIViewController?
+    private weak var presenter: CardListViewController?
+    private let transparent: Bool
 
     /// The body in its card.
     ///
-    /// - Parameter presenter: The view controller that presents the modal. Its
-    ///   `viewWillAppear` runs again when the modal is dismissed, which is what
-    ///   re-names the screen the user returns to.
-    static func makeCard(presenter: UIViewController) -> CardView {
-        CardView(title: "Modal (opaque)", arrangedSubviews: [ReplayModalCardBody(presenter: presenter)])
+    /// - Parameters:
+    ///   - presenter: The screen that presents the modal, and whose name is
+    ///     logged again once it closes.
+    ///   - transparent: Whether the screen beneath shows through the modal.
+    static func makeCard(presenter: CardListViewController, transparent: Bool = false) -> CardView {
+        CardView(
+            title: transparent ? "Modal (transparent)" : "Modal (opaque)",
+            arrangedSubviews: [ReplayModalCardBody(presenter: presenter, transparent: transparent)]
+        )
     }
 
-    init(presenter: UIViewController) {
+    init(presenter: CardListViewController, transparent: Bool) {
         self.presenter = presenter
+        self.transparent = transparent
         super.init(frame: .zero)
 
         axis = .vertical
@@ -45,7 +53,7 @@ final class ReplayModalCardBody: UIStackView {
         addArrangedSubview(
             makePrimaryButton(
                 title: "Open modal",
-                identifier: SampleID.ReplayModal.openOpaque,
+                identifier: transparent ? SampleID.ReplayModal.openTransparent : SampleID.ReplayModal.openOpaque,
                 action: UIAction { [weak self] _ in
                     self?.openModal()
                 }
@@ -59,8 +67,19 @@ final class ReplayModalCardBody: UIStackView {
     }
 
     private func openModal() {
-        let modal = ReplayModalViewController()
-        modal.modalPresentationStyle = .fullScreen
+        let modal = ReplayModalViewController(transparent: transparent)
+        if transparent {
+            // An over-full-screen presentation leaves the presenter in place, so
+            // its viewWillAppear does not run when the modal closes; name it here.
+            modal.modalPresentationStyle = .overFullScreen
+            modal.onClose = { [weak presenter] in
+                if let name = presenter?.screenName {
+                    SampleScreenNaming.nameCurrentScreen(name)
+                }
+            }
+        } else {
+            modal.modalPresentationStyle = .fullScreen
+        }
         presenter?.present(modal, animated: true)
     }
 }
@@ -75,9 +94,23 @@ final class ReplayModalCardBody: UIStackView {
 @MainActor
 private final class ReplayModalViewController: UIViewController {
 
+    /// Runs after the modal is dismissed.
+    var onClose: (() -> Void)?
+
+    private let transparent: Bool
     private let noteField = UITextField()
     private let statusLabel = makeBodyLabel("", style: .caption1, identifier: SampleID.ReplayModal.result)
     private var actionCount = 0
+
+    init(transparent: Bool) {
+        self.transparent = transparent
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -87,7 +120,9 @@ private final class ReplayModalViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = UIColor(named: "background")
+        view.backgroundColor = transparent
+            ? UIColor(named: "violet")?.withAlphaComponent(0.45)
+            : UIColor(named: "background")
 
         let title = UILabel()
         title.text = "Modal content"
@@ -124,7 +159,10 @@ private final class ReplayModalViewController: UIViewController {
                 title: "Close",
                 identifier: SampleID.ReplayModal.close,
                 action: UIAction { [weak self] _ in
-                    self?.dismiss(animated: true)
+                    // Taken before dismissing: the controller may be released
+                    // by the time the completion runs.
+                    let onClose = self?.onClose
+                    self?.dismiss(animated: true) { onClose?() }
                 }
             ),
             statusLabel

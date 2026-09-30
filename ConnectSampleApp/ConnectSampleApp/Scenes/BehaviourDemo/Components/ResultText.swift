@@ -45,3 +45,24 @@ struct CardBodyText: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+/// A card's hint — what to look for in the posted message — in a light-grey
+/// box.
+struct HintText: View {
+
+    let text: String
+
+    init(_ text: String) {
+        self.text = text
+    }
+
+    var body: some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(Color("violet"))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(Color("lightGrey"))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}

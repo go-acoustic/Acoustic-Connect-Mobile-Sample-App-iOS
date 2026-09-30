@@ -55,7 +55,12 @@ enum ScenarioPlatform: String {
 /// One shipped fix this harness verifies, and whether it is actually verifiable
 /// against the SDK build the app is running.
 ///
-/// Mirrors `verification/scenarios.ts` in the React Native sample.
+/// Mirrors `verification/scenarios.ts` in the React Native sample. Keys,
+/// titles, channels, platforms and order are React Native's verbatim, so the
+/// end-to-end suite reads the same registry on every sample. The `action`,
+/// `expected` and `blockedBy` text differs only where React Native's would be
+/// untrue for these apps — they run the native SDK, not the bridge — and
+/// each such passage says what the native SDK does instead.
 struct Scenario: Identifiable, Hashable {
 
     /// Stable, descriptive id — safe to quote in a support thread.
@@ -140,12 +145,17 @@ enum Scenarios {
         title: "loggedIn defaults to loginMethod",
         action: """
             Log an identity with both the signal type and the parameters \
-            omitted, so the bridge has to supply its own defaults.
+            omitted, so the SDK — the bridge, on React Native — has to supply \
+            its own defaults.
             """,
         expected: """
-            The signal carries loginMethod: email. Before the fix the loggedIn \
-            default was paired with registrationMethod, so every defaulted \
-            identity call emitted the wrong attribute.
+            On React Native the defaulted signal carries loginMethod: email. \
+            Before the fix the bridge paired its loggedIn default with \
+            registrationMethod, so every defaulted identity call emitted the \
+            wrong attribute. This app has no bridge: the native SDK defaults to \
+            signalType pageView with no method, and that is what it posts. The \
+            explicit accountRegistered call carries registrationMethod: email \
+            everywhere.
             """,
         channel: .reactNative,
         platform: .both
@@ -159,9 +169,12 @@ enum Scenarios {
             posted layout message.
             """,
         expected: """
-            The value arrives masked. The config block is named \
-            layoutConfigIos / layoutConfigAndroid; the bridge used to look for \
-            a plain "layoutConfig" key and so applied nothing at all.
+            The value arrives masked. In this app the rules live in \
+            ConnectLayoutConfig.json in the app bundle, which only \
+            enable(with:) reads — enable(appKey:postURL:) ignores it. React \
+            Native reads them from the layoutConfigIos / layoutConfigAndroid \
+            block of ConnectConfig.json; its bridge used to look for a plain \
+            "layoutConfig" key and so applied nothing at all.
             """,
         channel: .reactNative,
         platform: .both
@@ -191,7 +204,11 @@ enum Scenarios {
         expected: """
             The replay carries a populated control tree for the modal, not an \
             empty one. A React Native <Modal> presents outside the navigator \
-            hierarchy, which is why it took a separate capture path.
+            hierarchy, which is why it took a separate capture path. The \
+            modals in this app are native presentations, which need Connect \
+            iOS 2.1.38 or newer: each should log its own screen view and a \
+            layout carrying its controls, where older builds dropped a view \
+            controller declared private or nested — as these are.
             """,
         channel: .iOSNative,
         platform: .iOS
@@ -201,21 +218,19 @@ enum Scenarios {
         key: "screenview-referrer",
         title: "Screenview referrer points at the previous screen",
         action: """
-            Move between screens in Screen Views and read the referrer on each \
-            screenview.
+            Push and pop the Showcase detail chain and read the referrer on \
+            each screenview.
             """,
         expected: """
             referrer is the screen you came from. The iOS bug set it to the \
             screen's own name on every event, which collapses a whole session \
-            into one replay step. Android already chained it correctly.
+            into one replay step. Android already chained it correctly. A \
+            screen named with setCurrentScreen(pageName:) needs Connect iOS \
+            2.1.37 or newer, where that name is the screenview's name; older \
+            builds posted it as the referrer instead.
             """,
         channel: .iOSNative,
-        platform: .iOS,
-        blockedBy: """
-            Fixed in iOS source on 2026-08-20, but the newest published pod \
-            (AcousticConnectDebug 2.1.18) was tagged 2026-07-29. Running this \
-            today records the failing baseline.
-            """
+        platform: .iOS
     )
 
     static let webViewPostNotReplayedAsGet = Scenario(
@@ -223,9 +238,10 @@ enum Scenarios {
         title: "WebView form POST is not replayed as GET",
         action: "Submit the form in the WebView screen.",
         expected: """
-            The echo shows method POST. The capture reload used to re-issue \
-            the current URL as a GET, so a payment submission came back 405 \
-            Method Not Allowed.
+            The endpoint answers 200 and echoes the submitted form. It only \
+            answers POST, so a request replayed as a GET would come back 405 \
+            Method Not Allowed instead — which is how a payment submission \
+            failed when the capture reload re-issued the current URL as a GET.
             """,
         channel: .androidNative,
         platform: .android,
@@ -270,11 +286,12 @@ enum Scenarios {
             defaults to its own content — a masked address still travelled in \
             the label. `accessibility.id` is still present and unredacted, \
             deliberately: it identifies the element rather than describing it. \
-            Needs Connect iOS 2.1.22+ or Android 11.0.23-beta+ — both \
-            published, and AndroidVersion / iOSVersion are empty in \
-            ConnectConfig.example.json, so an unpinned sample resolves them. \
-            Against a pinned older SDK this records the failing baseline \
-            instead.
+            Needs Connect iOS 2.1.22+ or Android 11.0.23-beta+; against an \
+            older SDK this records the failing baseline instead. In the \
+            SwiftUI sample the rows carry their accessibility.id only from \
+            Connect iOS 2.1.41. The email rule that masks these rows is in \
+            ConnectLayoutConfig.json — without it nothing here is masked and \
+            every row reads as a leak.
             """,
         channel: .native,
         platform: .both

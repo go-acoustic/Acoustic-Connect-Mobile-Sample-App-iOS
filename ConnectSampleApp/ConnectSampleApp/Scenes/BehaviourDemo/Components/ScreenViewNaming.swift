@@ -16,9 +16,14 @@ extension View {
     ///
     /// Without a name the SDK falls back to the view controller's class, which
     /// is `UIHostingController` for every SwiftUI screen. `onAppear` runs before
-    /// the hosting controller's `viewDidAppear`, where the capture fires, so the
-    /// name is in place in time — and it runs again when the view reappears
-    /// after a pop, which re-names the screen the user came back to.
+    /// the hosting controller's `viewDidAppear`, where the SDK takes the name,
+    /// so the name is in place in time — and it runs again when the view
+    /// reappears after a pop, which re-names the screen the user came back to.
+    ///
+    /// - Note: Pushed and presented SwiftUI screens take the name from a
+    ///   Connect iOS build newer than 2.1.41. Older builds applied it only to a
+    ///   tab's root, and logged every other SwiftUI screen under its
+    ///   hosting-controller class.
     ///
     /// - Parameter name: The name to log.
     /// - Returns: The view, named.

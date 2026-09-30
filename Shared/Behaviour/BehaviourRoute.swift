@@ -25,9 +25,9 @@ import Foundation
 /// SwiftUI sample, the UIKit sample and React Native log the same screen names
 /// in the same order.
 ///
-/// The target shape is React Native's seven routes. This type carries the three
-/// that both samples render today; `ScreenViews`, `Case` and `WebViewPost`
-/// arrive with the screens that push them, so no route here is unreachable.
+/// The target shape is React Native's seven routes. This type carries the four
+/// that both samples render today; `ScreenViews` and `Case` arrive with the
+/// screens that push them, so no route here is unreachable.
 ///
 /// ## Example
 /// ```swift
@@ -54,6 +54,12 @@ enum BehaviourRoute: Hashable {
     ///   - depth: How many detail screens deep this one is, starting at 1.
     case showcaseDetail(name: String, depth: Int)
 
+    /// The WebView form-POST check, pushed from the Verification screen.
+    ///
+    /// Always present on iOS, unlike React Native, where the route is optional
+    /// because not every host app carries `react-native-webview`.
+    case webViewPost
+
     /// How deep the detail chain may go.
     ///
     /// A few levels show the referrer chain advancing; an unbounded stack is
@@ -73,6 +79,7 @@ enum BehaviourRoute: Hashable {
         case .showcase: return "Showcase"
         case .verification: return "Verification"
         case .showcaseDetail(let name, _): return name
+        case .webViewPost: return "WebViewPost"
         }
     }
 
@@ -82,6 +89,7 @@ enum BehaviourRoute: Hashable {
         case .showcase: return "Showcase"
         case .verification: return "Verification"
         case .showcaseDetail(let name, _): return name
+        case .webViewPost: return "WebView POST"
         }
     }
 

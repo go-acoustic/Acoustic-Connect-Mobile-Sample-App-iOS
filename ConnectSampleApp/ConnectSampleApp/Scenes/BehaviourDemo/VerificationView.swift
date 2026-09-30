@@ -8,28 +8,85 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
+import Connect
 import SwiftUI
 
 /// Verification screen — one card per shipped fix, for regression runs rather
 /// than as an integration reference.
 ///
+/// Composed card by card in the React Native sample's order
+/// (`VerificationScreen.tsx`), not by walking the scenario registry: the
+/// signal, capture-control and modal cards appear as the same plain cards the
+/// Showcase shows, and only the cards unique to this screen sit in a scenario
+/// frame.
+///
 /// Nothing is filtered by platform: an Android-only card still renders here so
 /// a tester can see what the other platform is expected to do, which is how the
 /// React Native sample behaves.
-///
-/// Cards whose body is also a Showcase demo share that body rather than
-/// duplicating it — the body is the demo, the frame is per screen.
 struct VerificationView: View {
+
+    private static let returnScreenName = BehaviourRoute.verification.screenName
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 howToReadCard
 
-                ForEach(Scenarios.all) { scenario in
-                    ScenarioCardView(scenario: scenario) {
-                        cardBody(for: scenario)
+                ScenarioCardView(scenario: Scenarios.screenViewReferrer)
+
+                ScenarioCardView(scenario: Scenarios.customEventValueTypes) {
+                    CustomEventBody()
+                }
+
+                SignalCard()
+
+                IdentityDefaultsCard()
+
+                MaskedFieldCard()
+
+                AccessibilityMaskCard()
+
+                CaptureControlCard()
+
+                ScenarioCardView(scenario: Scenarios.webViewPostNotReplayedAsGet) {
+                    NavigationLink(
+                        destination: BehaviourRoute.webViewPost.screen(WebViewPostView())
+                    ) {
+                        Text("Open WebView form POST")
                     }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .connectIdentifier(SampleID.WebView.open)
+                }
+
+                ScenarioCardView(scenario: Scenarios.replayCapturesModal) {
+                    CardBodyText("""
+                        The two modal cards below present outside the navigation \
+                        stack — one opaque full screen, one transparent over the \
+                        screen beneath — the case that produced an empty control \
+                        tree.
+                        """)
+                }
+
+                ReplayModalCard(returnScreenName: Self.returnScreenName)
+
+                ReplayModalCard(transparent: true, returnScreenName: Self.returnScreenName)
+
+                ScenarioCardView(scenario: Scenarios.androidCompileClasspath) {
+                    Text("""
+                        Verified by the Android sample building at all — a broken \
+                        compile classpath fails the Android build outright.
+                        """)
+                        .font(.caption)
+                        .foregroundStyle(Color("violet"))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(10)
+                        .background(alignment: .leading) {
+                            HStack(spacing: 0) {
+                                Color("acousticGreen").frame(width: 3)
+                                Color("lightGrey")
+                            }
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
             .padding(.horizontal)
@@ -38,26 +95,6 @@ struct VerificationView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("background"))
-    }
-
-    // MARK: - Scenario bodies
-
-    /// The interactive body for a scenario, where one exists.
-    ///
-    /// A body that is also a Showcase demo is the same view on both screens —
-    /// the body is the demo, the frame is per screen. Scenarios with nothing to
-    /// drive, such as the build-time one, render their Do / Expect text alone.
-    ///
-    /// - Parameter scenario: The scenario being rendered.
-    /// - Returns: The controls for that scenario.
-    @ViewBuilder
-    private func cardBody(for scenario: Scenario) -> some View {
-        switch scenario.key {
-        case Scenarios.customEventValueTypes.key:
-            CustomEventBody()
-        default:
-            EmptyView()
-        }
     }
 
     // MARK: - Cards

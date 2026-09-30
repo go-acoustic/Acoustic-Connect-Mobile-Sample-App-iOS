@@ -87,10 +87,9 @@ enum SampleID {
         static let back = "btn_showcase_back"
     }
 
-    /// **Reserved.** Verification screen — the cards unique to it, which arrive
-    /// with those cards. The custom-event, signal, replay-modal and
-    /// capture-control cards are shared with Showcase and keep the identifiers
-    /// declared under ``Showcase`` and ``ReplayModal``.
+    /// Verification screen — the cards unique to it. The custom-event, signal,
+    /// replay-modal and capture-control cards are shared with Showcase and keep
+    /// the identifiers declared under ``Showcase`` and ``ReplayModal``.
     enum Verification {
         static let identityDefaulted = "btn_identity_defaulted"
         static let identityExplicit = "btn_identity_explicit"
@@ -102,9 +101,9 @@ enum SampleID {
         static let accessibilityField = "a11y_field"
     }
 
-    /// Replay-modal controls. The opaque card is on Showcase;
-    /// ``openTransparent`` is **Reserved** for the transparent card, which
-    /// arrives with the Verification screen.
+    /// Replay-modal controls. The opaque card is on Showcase and Verification;
+    /// the transparent one, opened by ``openTransparent``, only on
+    /// Verification. Both modals share the controls inside them.
     ///
     /// React Native's `components/ReplayModalCard.tsx` carries no `testID` at
     /// all, so these names originate here rather than being mirrored. They are
@@ -124,7 +123,7 @@ enum SampleID {
         static let result = "txt_replay_modal_result"
     }
 
-    /// **Reserved.** WebView POST screen, which arrives with that screen.
+    /// WebView POST screen, pushed from the Verification screen.
     ///
     /// React Native also declares `txt_webview_unavailable`, shown when the
     /// navigator has no `WebViewPost` route because the Expo sample carries no

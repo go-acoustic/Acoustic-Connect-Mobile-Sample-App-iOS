@@ -46,17 +46,11 @@ struct TextCaptureCard: View {
                     identifier: SampleID.Showcase.secret
                 )
 
-                Text("""
+                HintText("""
                     The sample config masks values starting with SECRET-: capitals \
                     become X, lowercase x, digits 9 and symbols #. Compare the two \
                     fields in the posted layout message.
                     """)
-                    .font(.caption)
-                    .foregroundStyle(Color("violet"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(10)
-                    .background(Color("lightGrey"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
     }

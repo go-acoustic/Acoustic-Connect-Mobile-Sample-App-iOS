@@ -13,6 +13,12 @@ import UIKit
 /// Verification screen — one card per shipped fix, for regression runs rather
 /// than as an integration reference.
 ///
+/// Composed card by card in the React Native sample's order
+/// (`VerificationScreen.tsx`), not by walking the scenario registry: the
+/// signal, capture-control and modal cards appear as the same plain cards the
+/// Showcase shows, and only the cards unique to this screen sit in a scenario
+/// frame. Matches `VerificationView` in the SwiftUI sample.
+///
 /// Nothing is filtered by platform: an Android-only card still renders here so a
 /// tester can see what the other platform is expected to do, which is how the
 /// React Native sample behaves.
@@ -26,7 +32,28 @@ final class VerificationViewController: CardListViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCards([howToReadCard()] + Scenarios.all.map(card(for:)))
+        setCards([
+            howToReadCard(),
+            makeScenarioCard(scenario: Scenarios.screenViewReferrer),
+            makeScenarioCard(scenario: Scenarios.customEventValueTypes, body: [CustomEventBodyView()]),
+            SignalCardBody.makeCard(),
+            IdentityDefaultsCardBody.makeCard(),
+            MaskedFieldCardBody.makeCard(),
+            AccessibilityMaskCardBody.makeCard(),
+            CaptureControlCardBody.makeCard(),
+            webViewCard(),
+            makeScenarioCard(
+                scenario: Scenarios.replayCapturesModal,
+                body: [makeBodyLabel("""
+                    The two modal cards below present outside the navigation stack — \
+                    one opaque full screen, one transparent over the screen beneath — \
+                    the case that produced an empty control tree.
+                    """)]
+            ),
+            ReplayModalCardBody.makeCard(presenter: self),
+            ReplayModalCardBody.makeCard(presenter: self, transparent: true),
+            makeScenarioCard(scenario: Scenarios.androidCompileClasspath, body: [buildVerifiedNote()])
+        ])
     }
 
     // MARK: - Cards
@@ -51,20 +78,49 @@ final class VerificationViewController: CardListViewController {
         )
     }
 
-    /// Builds one scenario's card, with its interactive body where it has one.
-    ///
-    /// A body that is also a Showcase demo is the same view on both screens.
-    /// Scenarios with nothing to drive, such as the build-time one, render their
-    /// Do / Expect text alone.
-    ///
-    /// - Parameter scenario: The scenario to render.
-    /// - Returns: The card.
-    private func card(for scenario: Scenario) -> CardView {
-        switch scenario.key {
-        case Scenarios.customEventValueTypes.key:
-            return makeScenarioCard(scenario: scenario, body: [CustomEventBodyView()])
-        default:
-            return makeScenarioCard(scenario: scenario)
-        }
+    private func webViewCard() -> CardView {
+        makeScenarioCard(
+            scenario: Scenarios.webViewPostNotReplayedAsGet,
+            body: [
+                makeSecondaryButton(
+                    title: "Open WebView form POST",
+                    identifier: SampleID.WebView.open,
+                    action: UIAction { [weak self] _ in
+                        self?.pushWebViewPost()
+                    }
+                )
+            ]
+        )
+    }
+
+    /// The build-time scenario's note, on a green rule: there is nothing to tap.
+    private func buildVerifiedNote() -> UIView {
+        let note = makeBodyLabel("""
+            Verified by the Android sample building at all — a broken compile \
+            classpath fails the Android build outright.
+            """, style: .caption1)
+        note.textColor = UIColor(named: "violet")
+
+        let rule = UIView()
+        rule.backgroundColor = UIColor(named: "acousticGreen")
+        rule.widthAnchor.constraint(equalToConstant: 3).isActive = true
+
+        let row = UIStackView(arrangedSubviews: [rule, note])
+        row.axis = .horizontal
+        row.spacing = 10
+        row.isLayoutMarginsRelativeArrangement = true
+        row.layoutMargins = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 10)
+        row.backgroundColor = UIColor(named: "lightGrey")
+        row.layer.cornerRadius = 8
+        row.clipsToBounds = true
+        return row
+    }
+
+    // MARK: - Navigation
+
+    private func pushWebViewPost() {
+        let screen = WebViewPostViewController()
+        screen.title = BehaviourRoute.webViewPost.title
+        navigationController?.pushViewController(screen, animated: true)
     }
 }
