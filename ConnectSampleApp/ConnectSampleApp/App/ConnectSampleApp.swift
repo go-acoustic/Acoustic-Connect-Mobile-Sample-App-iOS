@@ -19,21 +19,12 @@ struct ConnectSampleApp: App {
             TabView {
                 PushDemoView()
                     .logsScreenView(named: "Push")
-                    .tabItem {
-                        Label("Push", systemImage: "bell")
-                    }
-                    .accessibilityIdentifier(SampleID.Tab.push)
+                    .sampleTab(.push)
                 IdentityDemoView()
                     .logsScreenView(named: "Identity")
-                    .tabItem {
-                        Label("Identity", systemImage: "person.crop.circle")
-                    }
-                    .accessibilityIdentifier(SampleID.Tab.identity)
+                    .sampleTab(.identity)
                 BehaviourDemoView()
-                    .tabItem {
-                        Label("Behaviour", systemImage: "chart.bar")
-                    }
-                    .accessibilityIdentifier(SampleID.Tab.behaviour)
+                    .sampleTab(.behaviour)
             }
             .tint(Color("periwinkle"))
         }
