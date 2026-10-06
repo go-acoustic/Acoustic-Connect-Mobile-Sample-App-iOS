@@ -18,9 +18,9 @@ import Foundation
 /// tells a reader nothing. Supplying a name replaces the inferred one, which is
 /// what makes the samples' screen names comparable with React Native's.
 ///
-/// Call this as the screen appears, before the capture fires: `viewWillAppear`
-/// in UIKit, `onAppear` in SwiftUI. Both samples route through here so they
-/// cannot name the same screen differently.
+/// Call this as the screen appears: `viewWillAppear` or `viewDidAppear` in UIKit,
+/// `onAppear` in SwiftUI. It names the current screen, never the next one. Both
+/// samples route through here so they cannot name the same screen differently.
 @MainActor
 enum SampleScreenNaming {
 
