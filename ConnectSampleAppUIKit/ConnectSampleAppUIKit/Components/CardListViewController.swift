@@ -17,6 +17,21 @@ class CardListViewController: UIViewController {
 
     private let cardStack = UIStackView()
 
+    /// The name logged for this screen's screen view.
+    ///
+    /// iOS otherwise names a screen view after the view controller's class,
+    /// which would give every card screen here the same name. Subclasses
+    /// override this with their route's ``BehaviourRoute/screenName``; a screen
+    /// that returns `nil` keeps the inferred name.
+    var screenName: String? { nil }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let screenName {
+            SampleScreenNaming.nameCurrentScreen(screenName)
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

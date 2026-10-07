@@ -17,6 +17,8 @@ import UIKit
 @MainActor
 final class IdentityViewController: CardListViewController {
 
+    override var screenName: String? { "Identity" }
+
     private let store = IdentityStore.shared
     private var cancellables = Set<AnyCancellable>()
 
@@ -36,6 +38,7 @@ final class IdentityViewController: CardListViewController {
     private func inputCard() -> CardView {
         let loggedInButton = makePrimaryButton(
             title: "Log Logged In With Email",
+            identifier: SampleID.Identity.sendIdentitySignal,
             action: UIAction { [weak self] _ in
                 self?.log { store, name, value in
                     store.logUserLoggedIn(identifierName: name, identifierValue: value)
@@ -44,6 +47,7 @@ final class IdentityViewController: CardListViewController {
         )
         let registeredButton = makePrimaryButton(
             title: "Log Account Registered With Email",
+            identifier: SampleID.Identity.sendAccountRegisteredSignal,
             action: UIAction { [weak self] _ in
                 self?.log { store, name, value in
                     store.logUserRegistered(identifierName: name, identifierValue: value)
@@ -54,8 +58,18 @@ final class IdentityViewController: CardListViewController {
         return CardView(
             title: "Log Identity",
             arrangedSubviews: [
-                makeLabeledTextField(label: "Identifier Name", placeholder: "Email Address", field: nameField),
-                makeLabeledTextField(label: "Identifier Value", placeholder: "user@example.com", field: valueField),
+                makeLabeledTextField(
+                    label: "Identifier Name",
+                    placeholder: "Email Address",
+                    field: nameField,
+                    identifier: SampleID.Identity.identifierName
+                ),
+                makeLabeledTextField(
+                    label: "Identifier Value",
+                    placeholder: "user@example.com",
+                    field: valueField,
+                    identifier: SampleID.Identity.identifierValue
+                ),
                 loggedInButton,
                 registeredButton
             ]

@@ -29,12 +29,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             navigationController(
                 root: IdentityViewController(),
                 title: "Identity",
-                systemImage: "person.crop.circle"
+                systemImage: "person.crop.circle",
+                identifier: SampleID.Tab.identity
             ),
             navigationController(
                 root: BehaviourViewController(),
                 title: "Behaviour",
-                systemImage: "chart.bar"
+                systemImage: "chart.bar",
+                identifier: SampleID.Tab.behaviour
             )
         ]
         tabBarController.tabBar.tintColor = UIColor(named: "periwinkle")
@@ -48,15 +50,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func navigationController(
         root: UIViewController,
         title: String,
-        systemImage: String
+        systemImage: String,
+        identifier: String
     ) -> UINavigationController {
         root.title = title
         let navigationController = UINavigationController(rootViewController: root)
-        navigationController.tabBarItem = UITabBarItem(
+        let item = UITabBarItem(
             title: title,
             image: UIImage(systemName: systemImage),
             selectedImage: nil
         )
+        item.accessibilityIdentifier = identifier
+        navigationController.tabBarItem = item
         return navigationController
     }
 }

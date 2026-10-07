@@ -8,74 +8,100 @@
 // Sample app provided "as is", without warranty of any kind.
 //
 
-import Combine
 import UIKit
 
-/// Behaviour tab. Drives `BehaviourStore`, the same type the SwiftUI sample's
-/// Behaviour tab drives.
+/// Behaviour tab root — a hub with two entry points into the analytics half of
+/// the SDK, matching the SwiftUI sample's `BehaviourDemoView`.
+///
+/// - **Showcase** is the general-purpose demo: one card per capture feature.
+/// - **Verification** is the release-verification surface: one card per shipped
+///   fix.
+///
+/// Both are pushed onto this tab's navigation controller, because screen-view
+/// logging only fires on a real navigation — and on UIKit each push produces a
+/// distinct view controller, which is the behaviour this sample exists to
+/// exercise.
 @MainActor
 final class BehaviourViewController: CardListViewController {
 
-    private let store = BehaviourStore.shared
-    private var cancellables = Set<AnyCancellable>()
-
-    private let resultLabel = makeBodyLabel("")
-    private lazy var resultCard = CardView(title: "Last Result", arrangedSubviews: [resultLabel])
+    override var screenName: String? { BehaviourRoute.hubScreenName }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCards([resultCard, automaticCaptureCard(), customEventCard()])
-        observeStore()
+        setCards([showcaseCard(), verificationCard(), footnoteCard()])
     }
 
     // MARK: - Cards
 
-    private func automaticCaptureCard() -> CardView {
-        CardView(
-            title: "Captured Automatically",
-            arrangedSubviews: [
-                makeBodyLabel("""
-                    Enabling the SDK is enough to capture screen views, taps and text \
-                    entry — no calls needed. Moving between these tabs already logs \
-                    screen views.
-                    """),
-                makeBodyLabel(
-                    "iOS posts to the collector when the app is backgrounded, so background the app and read the messages there.",
-                    style: .caption1
-                )
-            ]
-        )
-    }
-
-    private func customEventCard() -> CardView {
+    private func showcaseCard() -> CardView {
         let button = makePrimaryButton(
-            title: "Log Custom Event",
+            title: "Open Showcase",
+            identifier: SampleID.Behaviour.openShowcase,
             action: UIAction { [weak self] _ in
-                self?.store.logCustomEvent()
+                self?.push(ShowcaseViewController(), as: .showcase)
             }
         )
 
         return CardView(
-            title: "Custom Event",
+            title: "Showcase",
             arrangedSubviews: [
                 makeBodyLabel("""
-                    logEvent(name:values:) sends a named event with a flat map of \
-                    string, number and boolean values. Read it under customEvent in \
-                    the posted message.
+                    What the SDK captures once it is enabled: screen views, taps, \
+                    text entry, custom events, signals, dialogs, exceptions and \
+                    session replay of modals. One card per feature, each with the \
+                    call it makes and where to read the result.
                     """),
                 button
             ]
         )
     }
 
-    // MARK: - Store
-
-    private func observeStore() {
-        store.$lastResult
-            .sink { [weak self] result in
-                self?.resultLabel.text = result
-                self?.resultCard.isHidden = result == nil
+    private func verificationCard() -> CardView {
+        let button = makeSecondaryButton(
+            title: "Open Verification",
+            identifier: SampleID.Behaviour.openVerification,
+            action: UIAction { [weak self] _ in
+                self?.push(VerificationViewController(), as: .verification)
             }
-            .store(in: &cancellables)
+        )
+
+        return CardView(
+            title: "Verification",
+            arrangedSubviews: [
+                makeBodyLabel("""
+                    Release-verification checks. Each card verifies one shipped fix \
+                    against the SDK build this app is running, with the steps to \
+                    follow and the payload to expect. Intended for regression runs \
+                    rather than as an integration reference.
+                    """),
+                button
+            ]
+        )
+    }
+
+    private func footnoteCard() -> CardView {
+        CardView(
+            title: "Reading the results",
+            arrangedSubviews: [
+                makeBodyLabel("""
+                    Both screens post to the collector configured in \
+                    ConnectSDKManager. iOS posts when the app is backgrounded, so \
+                    background the app and read the messages there.
+                    """, style: .caption1)
+            ]
+        )
+    }
+
+    // MARK: - Navigation
+
+    /// Pushes a screen and titles it from its route, so a route's title and the
+    /// name it logs cannot drift apart.
+    ///
+    /// - Parameters:
+    ///   - viewController: The screen to push.
+    ///   - route: The route it represents.
+    private func push(_ viewController: UIViewController, as route: BehaviourRoute) {
+        viewController.title = route.title
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }

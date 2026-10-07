@@ -63,7 +63,8 @@ struct IdentityDemoView: View {
                 DemoTextField(
                     label: "Identifier Name",
                     placeholder: "Email Address",
-                    text: $identifierName
+                    text: $identifierName,
+                    identifier: SampleID.Identity.identifierName
                 )
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
@@ -71,7 +72,8 @@ struct IdentityDemoView: View {
                 DemoTextField(
                     label: "Identifier Value",
                     placeholder: "user@example.com",
-                    text: $identifierValue
+                    text: $identifierValue,
+                    identifier: SampleID.Identity.identifierValue
                 )
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
@@ -81,12 +83,14 @@ struct IdentityDemoView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
-                
+                .connectIdentifier(SampleID.Identity.sendIdentitySignal)
+
                 Button("Log Account Registered With Email") {
                     store.logUserRegistered(identifierName: identifierName, identifierValue: identifierValue)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .disabled(!canLog)
+                .connectIdentifier(SampleID.Identity.sendAccountRegisteredSignal)
             }
         }
     }

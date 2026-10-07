@@ -18,17 +18,13 @@ struct ConnectSampleApp: App {
         WindowGroup {
             TabView {
                 PushDemoView()
-                    .tabItem {
-                        Label("Push", systemImage: "bell")
-                    }
+                    .logsScreenView(named: "Push")
+                    .sampleTab(.push)
                 IdentityDemoView()
-                    .tabItem {
-                        Label("Identity", systemImage: "person.crop.circle")
-                    }
+                    .logsScreenView(named: "Identity")
+                    .sampleTab(.identity)
                 BehaviourDemoView()
-                    .tabItem {
-                        Label("Behaviour", systemImage: "chart.bar")
-                    }
+                    .sampleTab(.behaviour)
             }
             .tint(Color("periwinkle"))
         }

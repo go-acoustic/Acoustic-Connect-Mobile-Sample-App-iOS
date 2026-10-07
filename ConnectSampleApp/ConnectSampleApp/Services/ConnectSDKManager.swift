@@ -45,6 +45,14 @@ final class ConnectSDKManager: ObservableObject {
 
     private let notificationDelegate = NotificationDelegate()
 
+    /// How the SDK was started, so ``reenable()`` can start it the same way.
+    private enum StartMode {
+        case push
+        case analyticsOnly
+    }
+
+    private var startMode: StartMode?
+
     // MARK: - Observable state
 
     /// The current UNAuthorizationStatus for push notifications.
@@ -60,6 +68,7 @@ final class ConnectSDKManager: ObservableObject {
 
     /// Enables the Connect SDK. Call once from `AppDelegate.didFinishLaunchingWithOptions`.
     func start() {
+        startMode = .push
 
         // ┌──────────────────────────────────────────────────────────────────┐
         // │  Manual mode (default)                                          │
@@ -119,11 +128,34 @@ final class ConnectSDKManager: ObservableObject {
     /// Used by the UIKit sample, which ships without push entitlements or
     /// notification extensions. `push` defaults to `.off`, so an analytics-only
     /// host needs no push configuration at all.
+    ///
+    /// Goes through `enable(with:)` rather than `enable(appKey:postURL:)`
+    /// because only the `ConnectConfig` overload applies `layout`, whose
+    /// default reads `ConnectLayoutConfig.json` from the app bundle — the file
+    /// that carries the samples' masking rules.
     func startAnalyticsOnly() {
+        startMode = .analyticsOnly
         ConnectSDK.shared.enable(
-            appKey: ConnectConfiguration.appKey,
-            postURL: ConnectConfiguration.postURL
+            with: ConnectConfig(
+                appKey: ConnectConfiguration.appKey,
+                postURL: ConnectConfiguration.postURL
+            )
         )
+    }
+
+    /// Enables the SDK again after `ConnectSDK.shared.disable()`, the same way
+    /// it was first started.
+    ///
+    /// `enable` takes the credentials every time, so re-enabling means
+    /// repeating the launch call; this keeps the runtime capture-control card
+    /// from needing to know which sample it is running in. Does nothing if the
+    /// SDK was never started.
+    func reenable() {
+        switch startMode {
+        case .push: start()
+        case .analyticsOnly: startAnalyticsOnly()
+        case nil: break
+        }
     }
 
     // MARK: - Authorization
