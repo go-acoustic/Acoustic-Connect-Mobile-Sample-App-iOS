@@ -12,8 +12,8 @@
 import UIKit
 
 /// Click capture demo, matching `ClickCaptureCard` in the SwiftUI sample. There
-/// is no SDK call here on purpose: once the SDK is enabled, every tap is logged
-/// as a click event before the button handles it.
+/// is no SDK call here on purpose: once the SDK is enabled, every tap on a
+/// control is logged as a tap gesture before the button handles it.
 ///
 /// The counter is only there to show the tap registered with the app, so a tap
 /// the SDK failed to log can be told apart from one that never happened.
@@ -36,8 +36,8 @@ final class ClickCaptureCardBody: UIStackView {
         spacing = 10
 
         addArrangedSubview(makeBodyLabel("""
-            Every tap is logged as a click event. Nothing to call — tap the \
-            button and look for the click event in the next post.
+            Every tap on a control is logged as a tap gesture. Nothing to call — \
+            tap the button and look for the tap in the next post.
             """))
         addArrangedSubview(
             makePrimaryButton(

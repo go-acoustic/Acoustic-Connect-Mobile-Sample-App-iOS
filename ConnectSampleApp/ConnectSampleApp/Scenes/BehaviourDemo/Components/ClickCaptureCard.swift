@@ -12,7 +12,9 @@ import Connect
 import SwiftUI
 
 /// Click capture demo. There is no SDK call here on purpose: once the SDK is
-/// enabled, every tap is logged as a click event before the button handles it.
+/// enabled, a tap on a view marked with `connectIdentifier(_:)` is logged as a
+/// click event before the button handles it. SwiftUI draws its controls without
+/// a `UIView`, so a tap on an unmarked view is not logged.
 ///
 /// The counter is only there to show the tap registered with the app, so a tap
 /// the SDK failed to log can be told apart from one that never happened.
@@ -24,8 +26,9 @@ struct ClickCaptureCard: View {
         DemoCard(title: "Taps") {
             VStack(alignment: .leading, spacing: 10) {
                 CardBodyText("""
-                    Every tap is logged as a click event. Nothing to call — tap the \
-                    button and look for the click event in the next post.
+                    Taps on views marked with connectIdentifier are logged as click \
+                    events. Nothing to call — tap the button and look for the click \
+                    event in the next post.
                     """)
 
                 Button("Tap me") {
