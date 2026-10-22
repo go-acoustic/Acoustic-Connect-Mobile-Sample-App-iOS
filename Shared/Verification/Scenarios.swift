@@ -76,8 +76,13 @@ struct Scenario: Identifiable, Hashable {
     /// What a fixed build produces.
     let expected: String
 
+    /// Where the fix shipped: the React Native bridge, or one platform's
+    /// native SDK.
     let channel: ScenarioChannel
 
+    /// The platform whose SDK the fix was made in, identical in every sample's
+    /// registry. It does not limit where the card applies: `expected` says
+    /// what each app should send, and the card is checked on both.
     let platform: ScenarioPlatform
 
     /// Set when the fix exists in source but no published artifact carries it
@@ -302,6 +307,33 @@ enum Scenarios {
     /// Nothing is filtered by platform: an Android-only card still renders on
     /// iOS so a tester can see what the other platform is expected to do, which
     /// is how the React Native sample behaves.
+    static let maskingValueIdRules = Scenario(
+        key: "masking-value-id-rules",
+        title: "Masking applies value, id and password rules",
+        action: """
+            Open this screen, type a value starting with SECRET- into the last \
+            field, then tap the send button. Read each row in the posted layout \
+            message, and the screenshot that comes with the tap.
+            """,
+        expected: """
+            Every row arrives masked per the config's Sensitive rules: the \
+            address as xxxxxxxxxx9#xxxx#xxx whether or not it has a label, the \
+            card number as 9999 9999 9999 9999, the password field masked like \
+            any other value — never the typed text. No id or tap target carries \
+            the address, and the tap's screenshot obscures every masked row, the \
+            typed one included. The fix is in the Connect Android SDK, whose \
+            Compose capture applied only MaskAccessibilityLabelList and whose \
+            Views capture sent a password field as typed; on iOS this card shows \
+            that the same rules hold. The address and the SECRET- prefix match \
+            MaskValueList, and row 3 matches MaskAccessibilityIdList by its \
+            identifier, in ConnectLayoutConfig.json. MaskIdList matches the \
+            Tealeaf control id on iOS, not the identifier, which is why the id \
+            rule is there.
+            """,
+        channel: .androidNative,
+        platform: .android
+    )
+
     static let all: [Scenario] = [
         customEventValueTypes,
         signalNestedJSON,
@@ -311,6 +343,7 @@ enum Scenarios {
         replayCapturesModal,
         screenViewReferrer,
         webViewPostNotReplayedAsGet,
-        accessibilityLabelMasking
+        accessibilityLabelMasking,
+        maskingValueIdRules
     ]
 }

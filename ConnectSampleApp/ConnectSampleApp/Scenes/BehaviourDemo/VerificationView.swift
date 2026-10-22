@@ -52,6 +52,8 @@ struct VerificationView: View {
 
                 AccessibilityMaskCard()
 
+                MaskingRulesCard()
+
                 CaptureControlCard()
 
                 ScenarioCardView(scenario: Scenarios.webViewPostNotReplayedAsGet) {
