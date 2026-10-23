@@ -243,38 +243,16 @@ enum Scenarios {
         title: "WebView form POST is not replayed as GET",
         action: "Submit the form in the WebView screen.",
         expected: """
-            The endpoint answers 200 and echoes the submitted form. It only \
-            answers POST, so a request replayed as a GET would come back 405 \
-            Method Not Allowed instead — which is how a payment submission \
-            failed when the capture reload re-issued the current URL as a GET.
+            The endpoint answers 200 and echoes the submitted form, and the \
+            navigation count does not go up after the capture. It only answers \
+            POST, so a request replayed as a GET would come back 405 Method Not \
+            Allowed instead — which is how a payment submission failed on \
+            Android when the capture reload re-issued the current URL as a GET. \
+            Connect iOS captures a WebView without reloading it, so the POST \
+            result stays on screen.
             """,
         channel: .androidNative,
-        platform: .android,
-        blockedBy: """
-            This harness does not reproduce the 405, and the shipped SDK test \
-            explains why: WebView never calls shouldOverrideUrlLoading for a \
-            main-frame form POST, so a normal submission cannot trigger the \
-            conversion — the fix's own test drives the hazard directly \
-            instead. What this harness DID establish: setting \
-            GoogleWebViewEnabled false suppresses WebView instrumentation \
-            completely (Found Webview 11 -> 0, RNCWebView nodes 3 -> 0, with \
-            the screen demonstrably visited), which is the customer's missing \
-            workaround. On connect 11.0.18-beta — which does NOT carry the fix \
-            — the POST survives identically, with WebView capture demonstrably \
-            engaged (capture JS injected, RNCWebView nodes in the layout) and \
-            after an explicit logScreenLayout on the POST result. So a pass \
-            here says nothing about the fix. Two earlier leads here have since \
-            been measured and can be dropped: WebView discovery does work on \
-            this screen (Found Webview fires and RNCWebView nodes appear in \
-            the layout) once the WebView is scrolled into the viewport — the \
-            zero-hit readings came from capturing while it sat below the fold, \
-            which the tree-walk skips by design. What remains real is that the \
-            SDK logs "WebView Id is: null" for an RN-hosted WebView, so \
-            the DOM-capture DCID it waits for can never be matched, and a \
-            capture that does find the WebView currently drops the screen's \
-            whole layout message. That is a native-SDK defect, tracked \
-            separately.
-            """
+        platform: .android
     )
 
     static let accessibilityLabelMasking = Scenario(
