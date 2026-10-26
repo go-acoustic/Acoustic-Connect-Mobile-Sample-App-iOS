@@ -118,7 +118,7 @@ created in step 2.2.
    https://github.com/go-acoustic/ConnectDebug-SP
    ```
    > **Note:** This is the debug package. For production, use the release
-   > package URL when available.
+   > package, `https://github.com/go-acoustic/Connect-SP`.
 3. Set the version rule to **Up to Next Major Version** from `2.0.0`
 4. Click **Add Package**
 5. In the target selection dialog, add the **Connect** library to:
@@ -128,9 +128,17 @@ created in step 2.2.
 
 ### Option B: CocoaPods
 
+CocoaPods trunk becomes read-only on 2 December 2026 and receives no later
+versions of the Connect SDK pods. New versions are published to the Acoustic
+spec repo, `https://github.com/go-acoustic/PodSpecs.git`, so list it at the top
+of your `Podfile`.
+
 Add the following to your `Podfile`:
 
 ```ruby
+source 'https://github.com/go-acoustic/PodSpecs.git'
+source 'https://cdn.cocoapods.org/'
+
 platform :ios, '15.1'
 
 target 'YourApp' do
@@ -157,6 +165,16 @@ Then run:
 ```bash
 pod install
 ```
+
+CocoaPods clones the Acoustic spec repo on the first `pod install` that lists
+it. It does not refresh that clone on its own afterwards, so when you update to
+a newer SDK version, run `pod install --repo-update` (or `pod repo update`
+first).
+
+> **Pitfall:** Keep the `cdn.cocoapods.org` line. Declaring any `source`
+> disables the CocoaPods default, so without it your other pods stop resolving.
+> CocoaPods combines the versions from both sources, so versions published
+> before the trunk cutoff still resolve.
 
 > **Pitfall:** After `pod install`, always open the `.xcworkspace` file, not the
 > `.xcodeproj`. Opening the wrong file is a common source of "module not found"
@@ -853,6 +871,21 @@ Content** section.
 
 ---
 
+### CocoaPods cannot find a newer SDK version
+
+**Symptom:** `pod install` or `pod update` reports that no version of
+`AcousticConnect` or `AcousticConnectDebug` matches, or never moves past an
+older version, although a newer SDK version has been released.
+
+**Cause:** CocoaPods trunk receives no Connect SDK versions after
+2 December 2026. Newer versions are only in the Acoustic spec repo.
+
+**Fix:** Add `source 'https://github.com/go-acoustic/PodSpecs.git'` and
+`source 'https://cdn.cocoapods.org/'` at the top of your `Podfile`, then run
+`pod install --repo-update`.
+
+---
+
 ### Push token not received
 
 **Symptom:** `didRegisterForRemoteNotificationsWithDeviceToken` is never called.
@@ -950,6 +983,7 @@ Use this checklist to verify your integration is complete:
 - [ ] Apple Developer portal: App Group created and assigned to all targets
 - [ ] Acoustic Connect: APNs key uploaded with Key ID, Team ID, and Bundle ID
 - [ ] Xcode: SDK added via SPM, CocoaPods, or Carthage to all targets (app + extensions)
+- [ ] CocoaPods only: `Podfile` lists the `go-acoustic/PodSpecs` source and the CocoaPods CDN
 - [ ] Xcode: App Groups capability enabled on all targets with matching identifier
 - [ ] Xcode: Push Notifications capability enabled on main app target
 - [ ] Xcode: `remote-notification` background mode in Info.plist
