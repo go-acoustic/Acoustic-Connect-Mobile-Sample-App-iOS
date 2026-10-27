@@ -49,6 +49,7 @@ final class VerificationViewController: CardListViewController {
             IdentityDefaultsCardBody.makeCard(),
             MaskedFieldCardBody.makeCard(),
             AccessibilityMaskCardBody.makeCard(),
+            MaskingRulesCardBody.makeCard(),
             CaptureControlCardBody.makeCard(),
             webViewCard(),
             makeScenarioCard(

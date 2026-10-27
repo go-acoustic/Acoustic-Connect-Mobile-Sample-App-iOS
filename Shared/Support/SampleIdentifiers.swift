@@ -96,6 +96,14 @@ enum SampleID {
         static let accessibilityExplicit = "a11y_explicit"
         static let accessibilityValue = "a11y_value"
         static let accessibilityField = "a11y_field"
+        static let maskRulesLabelled = "mask_rules_labelled"
+        static let maskRulesUnlabelled = "mask_rules_unlabelled"
+        static let maskRulesCard = "mask_rules_card"
+        static let maskRulesEmailField = "mask_rules_email_field"
+        static let maskRulesPassword = "mask_rules_password"
+        static let maskRulesTyped = "mask_rules_typed"
+        static let maskRulesSend = "btn_mask_rules_send"
+        static let maskRulesResult = "txt_mask_rules_result"
     }
 
     /// Replay-modal controls. The opaque card is on Showcase and Verification;

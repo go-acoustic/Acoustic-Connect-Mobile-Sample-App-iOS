@@ -24,6 +24,9 @@ struct DemoTextField: View {
     /// addresses the same three elements on every platform.
     let identifier: String
 
+    /// A password field: shows dots in place of the text.
+    var isSecure: Bool = false
+
     private var labelIdentifier: String {
         SampleID.FieldPart.label(identifier)
     }
@@ -38,7 +41,7 @@ struct DemoTextField: View {
                 .font(.caption)
                 .foregroundStyle(isDisabled ? Color("middleGrey") : Color("darkGrey"))
                 .connectIdentifier(labelIdentifier)
-            TextField(placeholder, text: $text)
+            input
                 .connectIdentifier(identifier)
                 .font(.system(.subheadline, design: .monospaced))
                 .autocorrectionDisabled()
@@ -57,5 +60,14 @@ struct DemoTextField: View {
         // caption and the field, overwriting their own.
         .accessibilityElement(children: .contain)
         .connectIdentifier(containerIdentifier)
+    }
+
+    @ViewBuilder
+    private var input: some View {
+        if isSecure {
+            SecureField(placeholder, text: $text)
+        } else {
+            TextField(placeholder, text: $text)
+        }
     }
 }

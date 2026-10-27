@@ -75,7 +75,8 @@ func makeBodyLabel(
 }
 
 /// Caption label above a text field, plus the field itself, matching
-/// `DemoTextField` in the SwiftUI sample.
+/// `DemoTextField` in the SwiftUI sample. Return closes the keyboard, so it
+/// never stays over the tab bar or a sheet's controls.
 ///
 /// - Parameters:
 ///   - label: The caption above the field.
@@ -109,6 +110,7 @@ func makeLabeledTextField(
     field.leftViewMode = .always
     field.heightAnchor.constraint(equalToConstant: 44).isActive = true
     field.accessibilityIdentifier = identifier
+    field.addAction(UIAction { [weak field] _ in field?.resignFirstResponder() }, for: .editingDidEndOnExit)
 
     let stack = UIStackView(arrangedSubviews: [caption, field])
     stack.axis = .vertical

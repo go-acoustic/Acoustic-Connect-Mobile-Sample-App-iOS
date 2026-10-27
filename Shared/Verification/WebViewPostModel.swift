@@ -15,11 +15,12 @@ import WebKit
 
 /// The WebView form-POST check, shared by both samples' WebView POST screens.
 ///
-/// It probes whether the SDK's WebView capture turns a form POST into a GET:
-/// the capture path reloaded the WebView's current URL to grab the layout, and
-/// reloading a POST result re-issues it as a GET — which a customer saw as
-/// HTTP 405 on payment submission. The endpoint here only answers POST, so a
-/// replayed GET comes back 405, the customer's exact symptom.
+/// It probes whether the SDK's WebView capture turns a form POST into a GET.
+/// On Android the capture path reloaded the WebView's current URL to grab the
+/// layout, and reloading a POST result re-issues it as a GET — which a customer
+/// saw as HTTP 405 on payment submission. Connect iOS captures the WebView
+/// without reloading it. The endpoint here only answers POST, so a replayed GET
+/// comes back 405, the customer's exact symptom.
 ///
 /// The form is inline HTML, so the only network dependency is the echo
 /// endpoint. Point ``echoURL`` elsewhere if the device has no route to the
@@ -98,8 +99,8 @@ final class WebViewPostModel: NSObject, ObservableObject {
         webView.evaluateJavaScript("document.forms[0].submit(); true;")
     }
 
-    /// Captures the screen's layout now, which is what triggered the reload
-    /// that replayed the POST as a GET.
+    /// Captures the screen's layout now: on Android, the capture is what
+    /// triggered the reload that replayed the POST as a GET.
     ///
     /// Nothing captures by itself here: the configured trigger is a screen
     /// change, and submitting the form does not change screens. Without this
