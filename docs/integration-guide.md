@@ -547,6 +547,26 @@ layout which enables sensible defaults for all screens:
 This means analytics work out of the box with a minimal `ConnectConfig` — no
 layout file or additional configuration needed.
 
+### Click events on UIKit buttons
+
+By default a tap on a UIKit `UIButton` (target-action or `UIAction`) is captured
+as a gesture (message type 11) only, with no click event (type 4): the SDK's
+default advanced setting `button:click` is `0`. SwiftUI buttons post their click
+(`canvas:click` is on by default). To capture UIKit button clicks, turn the
+setting on when you enable the SDK:
+
+```swift
+ConnectSDK.shared.enable(
+    with: ConnectConfig(
+        appKey: "YOUR_APP_KEY",
+        postURL: "YOUR_POST_URL",
+        advanced: [ConnectConfig.AdvancedKey("button:click"): 1]
+    )
+)
+```
+
+Taps on the iOS 26 tab bar post no click event with any setting.
+
 ### Customising analytics per screen
 
 If you need per-screen control (e.g., disabling capture on a settings screen, or

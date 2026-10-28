@@ -118,7 +118,8 @@ final class ConnectSDKManager: ObservableObject {
             with: ConnectConfig(
                 appKey: ConnectConfiguration.appKey,
                 postURL: ConnectConfiguration.postURL,
-                push: pushConfig
+                push: pushConfig,
+                advanced: ConnectSDKManager.sampleAdvancedConfig
             )
         )
     }
@@ -138,10 +139,22 @@ final class ConnectSDKManager: ObservableObject {
         ConnectSDK.shared.enable(
             with: ConnectConfig(
                 appKey: ConnectConfiguration.appKey,
-                postURL: ConnectConfiguration.postURL
+                postURL: ConnectConfiguration.postURL,
+                advanced: ConnectSDKManager.sampleAdvancedConfig
             )
         )
     }
+
+    /// Advanced settings both samples start with.
+    ///
+    /// `button:click` is 0 in the SDK's default `ConnectAdvancedConfig.json`, so a tap
+    /// on a UIKit `UIButton` (target-action or `UIAction`) posts only a gesture (type 11)
+    /// and no click (type 4). SwiftUI buttons are captured as `canvas:click`, which is
+    /// on by default. The samples turn `button:click` on so a UIKit button posts its
+    /// click like a SwiftUI one; an app that wants UIKit clicks must do the same.
+    static let sampleAdvancedConfig: [ConnectConfig.AdvancedKey: Any] = [
+        ConnectConfig.AdvancedKey("button:click"): 1
+    ]
 
     /// Enables the SDK again after `ConnectSDK.shared.disable()`, the same way
     /// it was first started.
