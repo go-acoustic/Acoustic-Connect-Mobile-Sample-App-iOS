@@ -565,7 +565,8 @@ ConnectSDK.shared.enable(
 )
 ```
 
-Taps on the iOS 26 tab bar post no click event with any setting.
+Taps on tab-bar items, iOS 26 included, are button clicks too: they post a click
+only with `button:click` on.
 
 ### Customising analytics per screen
 
