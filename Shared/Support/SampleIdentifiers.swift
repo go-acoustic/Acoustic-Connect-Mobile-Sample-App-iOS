@@ -55,10 +55,13 @@ enum SampleID {
         static let sendAccountRegisteredSignal = "btn_send_account_registered_signal"
     }
 
-    /// Behaviour hub — the two entry points into the Behaviour stack.
+    /// Behaviour hub — the two entry points into the Behaviour stack, and the line
+    /// that says which SDK configuration profile this launch started with
+    /// (``ConnectProfile``).
     enum Behaviour {
         static let openShowcase = "btn_open_showcase"
         static let openVerification = "btn_open_verification"
+        static let connectProfile = "txt_connect_profile"
     }
 
     /// Showcase screen and its recursive detail screen.

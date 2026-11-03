@@ -114,12 +114,18 @@ final class ConnectSDKManager: ObservableObject {
         // │     • didFailToRegisterForRemoteNotificationsWithError          │
         // └──────────────────────────────────────────────────────────────────┘
 
+        // An automated test can start the sample under another SDK configuration
+        // with the launch argument `-connectProfile <name>`; with none, `profile`
+        // leaves the configuration below as it is. See ConnectProfile.swift.
+        let profile = ConnectProfile.current
+
         ConnectSDK.shared.enable(
             with: ConnectConfig(
                 appKey: ConnectConfiguration.appKey,
                 postURL: ConnectConfiguration.postURL,
                 push: pushConfig,
-                advanced: ConnectSDKManager.sampleAdvancedConfig
+                layout: profile.layout,
+                advanced: profile.advanced(over: ConnectSDKManager.sampleAdvancedConfig)
             )
         )
     }
@@ -136,11 +142,13 @@ final class ConnectSDKManager: ObservableObject {
     /// that carries the samples' masking rules.
     func startAnalyticsOnly() {
         startMode = .analyticsOnly
+        let profile = ConnectProfile.current
         ConnectSDK.shared.enable(
             with: ConnectConfig(
                 appKey: ConnectConfiguration.appKey,
                 postURL: ConnectConfiguration.postURL,
-                advanced: ConnectSDKManager.sampleAdvancedConfig
+                layout: profile.layout,
+                advanced: profile.advanced(over: ConnectSDKManager.sampleAdvancedConfig)
             )
         )
     }

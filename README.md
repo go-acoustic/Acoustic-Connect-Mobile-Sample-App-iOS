@@ -92,6 +92,7 @@ Select the **ConnectSampleApp** scheme and run on a device or simulator.
 Shared/                              # UI-free feature code, used by both apps
   Identity/IdentityStore.swift       # Identity signalling and history
   Behaviour/BehaviourStore.swift     # Behaviour capture calls
+  Support/ConnectProfile.swift       # -connectProfile launch argument for automated tests
 
 ConnectSampleApp/                    # SwiftUI sample — push, identity, behaviour
   ConnectSampleApp/
@@ -160,6 +161,54 @@ For per-screen customisation (e.g., disabling capture on specific screens or
 adding custom masking rules), add a `ConnectLayoutConfig.json` to your app
 bundle. See the [Integration Guide](docs/integration-guide.md#analytics-configuration)
 for details.
+
+---
+
+## SDK configuration profiles (automated tests)
+
+An automated test can start either sample under a named SDK configuration, so
+one build covers several. Pass the name as the launch argument
+`-connectProfile <name>`. With no argument, or an empty one, the sample starts
+with the configuration described above.
+
+| Profile | What it sets |
+|---------|--------------|
+| `session-timeout-1m` | The sample's configuration, with the advanced setting `SessionTimeout` at `1`. The SDK multiplies the value by 60000 ms, so the unit is minutes (default `30`). |
+| `no-screenshots` | The sample's own layout (`ConnectLayoutConfig.json`, masking rules included) with `ScreenShot` set to `false` in `GlobalScreenSettings`, so no screen is captured with a screenshot. |
+| `sdk-defaults` | The SDK's layout and advanced defaults: `ConnectConfig.Layout.basicAnalytics` instead of the bundled layout file, and none of the sample's advanced settings (`button:click` stays at the SDK default, `0`). Push is configured as without a profile. |
+
+A name that matches none of these is ignored: the sample starts as it does
+without a profile and shows the name as unknown.
+
+The profile applies when the SDK starts, so launch the app fresh. Relaunch
+without the argument to return to the default.
+
+```bash
+# Simulator
+xcrun simctl terminate booted <bundle id>
+xcrun simctl launch booted <bundle id> -connectProfile session-timeout-1m
+```
+
+```swift
+// XCUITest
+app.launchArguments = ["-connectProfile", "session-timeout-1m"]
+app.launch()
+```
+
+Appium (XCUITest driver): terminate the app, then `mobile: launchApp` with
+`{"bundleId": "<bundle id>", "arguments": ["-connectProfile", "session-timeout-1m"]}`.
+
+The Behaviour tab's hub screen shows the profile the launch took, in a text with
+the accessibility identifier `txt_connect_profile`:
+
+| Launch | Text |
+|--------|------|
+| no argument | `Profile: default` |
+| `-connectProfile no-screenshots` | `Profile: no-screenshots` |
+| `-connectProfile misspelt` | `Profile: unknown misspelt` |
+
+The mapping lives in [`Shared/Support/ConnectProfile.swift`](Shared/Support/ConnectProfile.swift)
+and is applied in `ConnectSDKManager` before `ConnectSDK.shared.enable(with:)`.
 
 ---
 

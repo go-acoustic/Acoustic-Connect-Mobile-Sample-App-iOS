@@ -45,6 +45,7 @@ struct BehaviourDemoView: View {
         ScrollView {
             VStack(spacing: 20) {
                 headerView
+                profileLine
                 showcaseCard
                 verificationCard
                 footnote
@@ -68,6 +69,15 @@ struct BehaviourDemoView: View {
                 .foregroundStyle(Color("violet"))
         }
         .padding(.top, 24)
+    }
+
+    /// The SDK configuration profile this launch started with, for a test to read
+    /// back. See ``ConnectProfile``.
+    private var profileLine: some View {
+        ResultText(
+            text: ConnectProfile.current.statusText,
+            identifier: SampleID.Behaviour.connectProfile
+        )
     }
 
     private var showcaseCard: some View {

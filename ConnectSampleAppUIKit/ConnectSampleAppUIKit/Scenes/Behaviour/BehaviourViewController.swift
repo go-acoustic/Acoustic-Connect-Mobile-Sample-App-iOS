@@ -28,10 +28,19 @@ final class BehaviourViewController: CardListViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCards([showcaseCard(), verificationCard(), footnoteCard()])
+        setCards([profileLabel(), showcaseCard(), verificationCard(), footnoteCard()])
     }
 
     // MARK: - Cards
+
+    /// The SDK configuration profile this launch started with, for a test to read
+    /// back. See ``ConnectProfile``.
+    private func profileLabel() -> UILabel {
+        let label = makeResultLabel(identifier: SampleID.Behaviour.connectProfile)
+        label.text = ConnectProfile.current.statusText
+        label.isHidden = false
+        return label
+    }
 
     private func showcaseCard() -> CardView {
         let button = makePrimaryButton(
