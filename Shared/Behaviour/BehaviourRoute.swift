@@ -69,6 +69,8 @@ enum BehaviourRoute: Hashable {
     ///   navigation cases reach here, so its name is never `nil`.
     case screenViewCase(ScreenViewCase)
 
+    case gestures
+
     /// How deep the detail chain may go.
     ///
     /// A few levels show the referrer chain advancing; an unbounded stack is
@@ -91,6 +93,7 @@ enum BehaviourRoute: Hashable {
         case .webViewPost: return "WebViewPost"
         case .screenViews: return "Screen Views"
         case .screenViewCase(let screenViewCase): return screenViewCase.name ?? ""
+        case .gestures: return "Gestures"
         }
     }
 
@@ -105,6 +108,7 @@ enum BehaviourRoute: Hashable {
         // The case label, never the logged name: a 300-character or emoji name
         // would make the header unreadable, and the screen body prints it anyway.
         case .screenViewCase(let screenViewCase): return screenViewCase.label
+        case .gestures: return "Gestures"
         }
     }
 

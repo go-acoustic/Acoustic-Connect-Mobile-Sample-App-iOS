@@ -173,6 +173,20 @@ enum SampleID {
         }
     }
 
+    enum Gestures {
+        static let open = "btn_open_gestures"
+        static let last = "tv_gestures_last"
+        static let longPress = "gesture_long_press"
+        static let doubleTap = "gesture_double_tap"
+        static let swipe = "gesture_swipe"
+        static let pinchZoom = "gesture_pinch_zoom"
+        static let scrollList = "gesture_scroll_list"
+
+        static func row(_ index: Int) -> String {
+            "gesture_row_\(index)"
+        }
+    }
+
     /// Suffixes React Native's `DemoTextField` adds around a field's own
     /// identifier, mirrored so a page object can address the same three
     /// elements on every platform.

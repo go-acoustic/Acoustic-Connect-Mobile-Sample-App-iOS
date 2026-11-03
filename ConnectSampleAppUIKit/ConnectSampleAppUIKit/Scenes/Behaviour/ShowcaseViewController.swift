@@ -33,6 +33,7 @@ final class ShowcaseViewController: CardListViewController {
             howToReadCard(),
             screenViewsCard(),
             ClickCaptureCardBody.makeCard(),
+            gesturesCard(),
             TextCaptureCardBody.makeCard(),
             customEventCard(),
             SignalCardBody.makeCard(),
@@ -79,6 +80,28 @@ final class ShowcaseViewController: CardListViewController {
                     controller's class unless the app supplies a name, so these \
                     screens set theirs explicitly; the referrer is the screen you \
                     came from.
+                    """),
+                button
+            ]
+        )
+    }
+
+    private func gesturesCard() -> CardView {
+        let button = makeSecondaryButton(
+            title: "Open gestures",
+            identifier: SampleID.Gestures.open,
+            action: UIAction { [weak self] _ in
+                self?.navigationController?.pushViewController(GesturesViewController(), animated: true)
+            }
+        )
+
+        return CardView(
+            title: "Gestures",
+            arrangedSubviews: [
+                makeBodyLabel("""
+                    Long press, double tap, swipe in any direction, pinch and scroll \
+                    targets on a screen of their own. Compare the gesture type in each \
+                    posted event with the one the screen reports.
                     """),
                 button
             ]

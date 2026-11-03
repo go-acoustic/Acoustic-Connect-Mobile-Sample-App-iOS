@@ -32,6 +32,7 @@ struct ShowcaseView: View {
                 howToReadCard
                 screenViewsCard
                 ClickCaptureCard()
+                gesturesCard
                 TextCaptureCard()
                 customEventCard
                 SignalCard()
@@ -91,6 +92,24 @@ struct ShowcaseView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .connectIdentifier(SampleID.Showcase.openDetail)
+            }
+        }
+    }
+
+    private var gesturesCard: some View {
+        DemoCard(title: "Gestures") {
+            VStack(alignment: .leading, spacing: 10) {
+                CardBodyText("""
+                    Long press, double tap, swipe in any direction, pinch and scroll \
+                    targets on a screen of their own. Compare the gesture type in each \
+                    posted event with the one the screen reports.
+                    """)
+
+                NavigationLink(destination: BehaviourRoute.gestures.screen(GesturesView())) {
+                    Text("Open gestures")
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .connectIdentifier(SampleID.Gestures.open)
             }
         }
     }
