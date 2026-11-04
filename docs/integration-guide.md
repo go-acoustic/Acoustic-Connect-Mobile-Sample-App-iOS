@@ -608,6 +608,41 @@ adding custom masking rules for sensitive fields), add a
 When the file is present, the SDK uses it instead of the built-in defaults.
 Per-screen entries override `GlobalScreenSettings` for matching view controllers.
 
+### Masking SwiftUI text in screenshots
+
+Text fields, secure fields and UIKit labels are checked against every masking
+rule. SwiftUI draws static text without a `UIView`, so the rules reach it only
+where you mark it:
+
+- **A fixed sensitive view** (for example a card-number row): give it an
+  identifier with `connectIdentifier(_:)` and list that identifier in
+  `MaskAccessibilityIdList`. It is always covered in screenshots.
+- **A value your app shows at runtime** (for example an email address from your
+  backend): mark the `Text` with `connectMaskable()`. It is covered when its text
+  matches `MaskValueList`.
+
+```swift
+Text("Signed in as \(user.email)")
+    .connectMaskable()
+
+Button("Send to \(user.email)", action: send)
+    .connectMaskable(user.email)   // views other than Text: pass the value
+
+ConnectText(user.email)            // a Text that is always checked
+```
+
+`connectMaskable()` reads the text from the `Text`: a plain string, a localized
+key with its interpolated values (the key as written, not the translation), an
+attributed string, or a concatenation of these. The rules are checked against the
+text as shown (values filled in, markdown removed) and against each value. An
+interpolated value with a formatter is checked as the formatter shows it, a number
+without one as its specifier shows it and as its digits. Text it cannot read, such as `Text(date, style:)` or
+`Text(number, format:)`, is always covered while `MaskValueList` has a rule.
+SwiftUI text you do not mark is never matched against `MaskValueList`. SwiftUI
+static text is not part of screen layouts; these modifiers change screenshots only.
+They place an invisible UIKit view behind the marked view, which SwiftUI does not
+draw inside `drawingGroup()`, `ImageRenderer` or a widget: do not mark text there.
+
 ### Explicit programmatic layout
 
 You can also pass the layout configuration directly in code:

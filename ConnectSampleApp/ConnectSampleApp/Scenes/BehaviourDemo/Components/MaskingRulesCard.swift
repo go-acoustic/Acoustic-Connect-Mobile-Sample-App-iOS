@@ -35,11 +35,13 @@ struct MaskingRulesCard: View {
             VStack(alignment: .leading, spacing: 10) {
                 row("1 · value rule, with a label") {
                     Text(Self.address)
+                        .connectMaskable()
                         .accessibilityLabel("Contact email")
                         .connectIdentifier(SampleID.Verification.maskRulesLabelled)
                 }
                 row("2 · value rule, no label") {
                     Text(Self.address)
+                        .connectMaskable()
                         .connectIdentifier(SampleID.Verification.maskRulesUnlabelled)
                 }
                 row("3 · id rule") {
@@ -70,6 +72,7 @@ struct MaskingRulesCard: View {
                     sent = true
                 }
                 .buttonStyle(PrimaryButtonStyle())
+                .connectMaskable(Self.address)
                 .connectIdentifier(SampleID.Verification.maskRulesSend)
 
                 if sent {
